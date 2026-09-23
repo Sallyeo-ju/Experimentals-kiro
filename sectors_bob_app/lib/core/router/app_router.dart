@@ -1,0 +1,213 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/auth/login_screen.dart';
+import '../../features/auth/signup_screen.dart';
+import '../../features/chat/chat_screen.dart';
+import '../../features/home/home_screen.dart';
+import '../../features/news/news_screen.dart';
+import '../../features/onboarding/onboarding_screen.dart';
+import '../../features/splash/splash_screen.dart';
+import '../../features/stock_detail/stock_detail_screen.dart';
+import '../theme/app_colors.dart';
+
+/// Route path constants, kept in one place so screens can navigate by name
+/// without string typos.
+class AppRoutes {
+  const AppRoutes._();
+
+  static const String splash = '/splash';
+  static const String onboarding = '/onboarding';
+  static const String auth = '/auth';
+
+  /// Sign up. Navigated to from the login screen.
+  static const String signup = '/signup';
+  static const String news = '/news';
+  static const String home = '/home';
+  static const String ai = '/ai';
+
+  /// Builds the AI tab location, optionally carrying a seed prompt or a ticker
+  /// so the chat can open pre-filled. FEAT-003 reads these query parameters.
+  static String aiWith({String? seed, String? ticker}) {
+    final Map<String, String> query = <String, String>{};
+    if (seed != null && seed.trim().isNotEmpty) {
+      query['seed'] = seed.trim();
+    }
+    if (ticker != null && ticker.trim().isNotEmpty) {
+      query['ticker'] = ticker.trim();
+    }
+    if (query.isEmpty) {
+      return ai;
+    }
+    return Uri(path: ai, queryParameters: query).toString();
+  }
+
+  /// Stock detail. Navigate with '/stock/BBCA'.
+  static const String stockPattern = '/stock/:ticker';
+  static String stock(String ticker) => '/stock/$ticker';
+}
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorNews = GlobalKey<NavigatorState>();
+final _shellNavigatorHome = GlobalKey<NavigatorState>();
+final _shellNavigatorAi = GlobalKey<NavigatorState>();
+
+/// The app router.
+///
+/// FEAT-002 and FEAT-003 replace the placeholder builders below with the real
+/// screens. The route graph itself is final: splash, onboarding, auth, a
+/// three-tab shell (Berita, Beranda, AI), and stock detail.
+final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
+  // No redirect/auth guard is wired here on purpose: this is a mock-only hero
+  // flow demo, so /home, /ai, and /stock/:ticker stay directly reachable for
+  // easy walkthroughs. Before shipping a real backend, add a `redirect` that
+  // watches authStateProvider and sends unauthenticated users to /auth while
+  // keeping the Splash -> Onboarding -> Auth -> Home path intact.
+  return GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: AppRoutes.splash,
+    routes: <RouteBase>[
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.auth,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signup,
+        builder: (context, state) => const SignupScreen(),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return _HomeShell(navigationShell: navigationShell);
+        },
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorNews,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.news,
+                builder: (context, state) => const NewsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorHome,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorAi,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.ai,
+                builder: (context, state) {
+                  final String? seed = state.uri.queryParameters['seed'];
+                  final String? ticker = state.uri.queryParameters['ticker'];
+                  // A key derived from the seed and ticker remounts the chat
+                  // screen when Home or Stock Detail opens it with a new prompt,
+                  // which resets and re-seeds the conversation. Without a new
+                  // seed the branch stays alive (indexedStack) and an existing
+                  // conversation is preserved across tab switches on purpose.
+                  return ChatScreen(
+                    key: ValueKey<String>('ai-${seed ?? ''}-${ticker ?? ''}'),
+                    seed: seed,
+                    ticker: ticker,
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.stockPattern,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final String ticker = state.pathParameters['ticker'] ?? '';
+          return StockDetailScreen(ticker: ticker.toUpperCase());
+        },
+      ),
+    ],
+  );
+});
+
+/// The three-tab shell. Beranda sits in the center as the hero destination.
+class _HomeShell extends StatelessWidget {
+  const _HomeShell({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  void _goBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const TextStyle(
+                color: AppColors.accentPress,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              );
+            }
+            return const TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            );
+          }),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const IconThemeData(color: AppColors.accentPress);
+            }
+            return const IconThemeData(color: AppColors.textSecondary);
+          }),
+        ),
+        child: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: _goBranch,
+          backgroundColor: AppColors.surface,
+          indicatorColor: AppColors.surfaceAlt,
+          destinations: const <NavigationDestination>[
+            NavigationDestination(
+              icon: Icon(Icons.article_outlined),
+              selectedIcon: Icon(Icons.article),
+              label: 'Berita',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Beranda',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.auto_awesome_outlined),
+              selectedIcon: Icon(Icons.auto_awesome),
+              label: 'BOB AI',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
