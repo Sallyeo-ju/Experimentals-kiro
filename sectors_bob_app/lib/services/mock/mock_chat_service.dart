@@ -89,7 +89,7 @@ class MockChatService implements ChatService {
     }
 
     return '${detail.name} bergerak $arah pada perdagangan terakhir di sektor '
-        '${detail.sector.toLowerCase()}. $kondisi Perhatikan bahwa ini adalah '
+        '${detail.stock.sector.toLowerCase()}. $kondisi Perhatikan bahwa ini adalah '
         'ringkasan data, bukan ajakan untuk mengambil posisi tertentu.';
   }
 }
