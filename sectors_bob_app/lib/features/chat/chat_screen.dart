@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../services/models/analysis_models.dart';
 import '../../services/models/stock_models.dart';
 import 'chat_controller.dart';
 import 'widgets/analysis_card.dart';
