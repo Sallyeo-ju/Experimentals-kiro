@@ -60,7 +60,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 4),
-              const Center(child: AppLogo(size: 52)),
+              const Center(child: AppLogo(size: 68)),
               const SizedBox(height: 28),
               Container(
                 padding: const EdgeInsets.all(22),

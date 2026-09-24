@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// The BOB logo widget that renders the real brand logo image asset.
+/// The BOB logo widget that renders the brand logo image asset.
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
-    this.size = 44,
+    this.size = 72,
+    this.showSubtitle = true,
     this.showWordmark = true,
     this.onTeal = true,
     this.assetPath = 'assets/images/logo.png',
   });
 
-  /// Edge length or height of the logo image.
+  /// Height of the logo PNG image.
   final double size;
 
-  /// When true the BOB wordmark is shown next to the mark.
+  /// When true the subtitle ('Analis saham AI') is shown below the logo image.
+  final bool showSubtitle;
+
+  /// Backwards-compatible alias for [showSubtitle].
   final bool showWordmark;
 
   /// When true text colors are tuned for the teal canvas, otherwise for the
@@ -27,15 +31,13 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color wordColor =
-        onTeal ? AppColors.textOnTeal : AppColors.textPrimary;
+    final bool displaySubtitle = showSubtitle && showWordmark;
     final Color subColor =
         onTeal ? AppColors.textOnTeal2 : AppColors.textSecondary;
 
-    final Widget mark = Image.asset(
+    final Widget logoImage = Image.asset(
       assetPath,
       height: size,
-      width: size,
       fit: BoxFit.contain,
       errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
         return Icon(
@@ -46,40 +48,25 @@ class AppLogo extends StatelessWidget {
       },
     );
 
-    if (!showWordmark) {
-      return mark;
+    if (!displaySubtitle) {
+      return logoImage;
     }
 
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        mark,
-        SizedBox(width: size * 0.28),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'BOB',
-              style: TextStyle(
-                color: wordColor,
-                fontSize: size * 0.62,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
-                height: 1,
-              ),
-            ),
-            SizedBox(height: size * 0.06),
-            Text(
-              'Analis saham AI',
-              style: TextStyle(
-                color: subColor,
-                fontSize: size * 0.26,
-                fontWeight: FontWeight.w500,
-                height: 1,
-              ),
-            ),
-          ],
+        logoImage,
+        SizedBox(height: size * 0.10),
+        Text(
+          'Analis saham AI',
+          style: TextStyle(
+            color: subColor,
+            fontSize: (size * 0.18).clamp(12.0, 16.0),
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.5,
+            height: 1,
+          ),
         ),
       ],
     );

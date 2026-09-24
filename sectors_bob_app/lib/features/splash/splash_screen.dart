@@ -53,7 +53,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const AppLogo(size: 72),
+            const AppLogo(size: 92),
             const SizedBox(height: 28),
             Text(
               'Analisis saham, dalam bahasa manusia',
