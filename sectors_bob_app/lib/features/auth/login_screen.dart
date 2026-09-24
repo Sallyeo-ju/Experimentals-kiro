@@ -56,10 +56,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final String? error = state.hasError ? 'Tidak bisa masuk. Periksa email dan kata sandi, lalu coba lagi.' : null;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: TealBackground(
-        child: SafeArea(
+    return TealBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
