@@ -59,10 +59,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         ? 'Pendaftaran gagal. Periksa data kamu, lalu coba lagi.'
         : null;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: TealBackground(
-        child: SafeArea(
+    return TealBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
