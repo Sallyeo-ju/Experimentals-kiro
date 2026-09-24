@@ -6,6 +6,7 @@ import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import 'belajar_screen.dart';
+import 'comments_controller.dart';
 
 /// In-app reader for a market news article, opened from the Belajar feed.
 ///
@@ -143,6 +144,230 @@ class _Body extends StatelessWidget {
             style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
           ),
         ),
+        const SizedBox(height: 24),
+        _CommentsSection(articleId: article.id),
+      ],
+    );
+  }
+}
+
+/// The article comment section: a header with count, the list of comments, and
+/// a composer to post a new one. Local-only (see [commentsProvider]).
+class _CommentsSection extends ConsumerStatefulWidget {
+  const _CommentsSection({required this.articleId});
+
+  final String articleId;
+
+  @override
+  ConsumerState<_CommentsSection> createState() => _CommentsSectionState();
+}
+
+class _CommentsSectionState extends ConsumerState<_CommentsSection> {
+  final TextEditingController _input = TextEditingController();
+
+  @override
+  void dispose() {
+    _input.dispose();
+    super.dispose();
+  }
+
+  void _post() {
+    final String text = _input.text.trim();
+    if (text.isEmpty) {
+      return;
+    }
+    ref.read(commentsProvider.notifier).add(widget.articleId, text);
+    _input.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    final List<ArticleComment> comments = ref.watch(
+      commentsProvider.select((m) =>
+          m[widget.articleId] ?? const <ArticleComment>[]),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Icon(Icons.mode_comment_outlined,
+                size: 18, color: context.c.textOnCanvas),
+            const SizedBox(width: 8),
+            Text(
+              'Komentar',
+              style: text.titleMedium?.copyWith(
+                color: context.c.textOnCanvas,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '(${comments.length})',
+              style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (comments.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              'Belum ada komentar. Jadilah yang pertama berkomentar.',
+              style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
+            ),
+          )
+        else
+          for (final ArticleComment c in comments) ...<Widget>[
+            _CommentTile(comment: c),
+            const SizedBox(height: 10),
+          ],
+        const SizedBox(height: 4),
+        _CommentComposer(controller: _input, onSend: _post),
+      ],
+    );
+  }
+}
+
+/// One comment: a small avatar with the author's initial, the name and time,
+/// and the comment text.
+class _CommentTile extends StatelessWidget {
+  const _CommentTile({required this.comment});
+
+  final ArticleComment comment;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    final String initial = comment.author.isNotEmpty
+        ? comment.author.substring(0, 1).toUpperCase()
+        : '?';
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(AppColors.radiusCard),
+        border: Border.all(color: context.c.surfaceLine),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            height: 34,
+            width: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: comment.isMine ? context.c.accent : context.c.surfaceAlt,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              initial,
+              style: TextStyle(
+                color: comment.isMine
+                    ? context.c.textOnAccent
+                    : context.c.textPrimary,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Text(
+                      comment.author,
+                      style: text.bodyMedium?.copyWith(
+                        color: context.c.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      comment.timeAgo,
+                      style: text.bodySmall
+                          ?.copyWith(color: context.c.textSecondary),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  comment.text,
+                  style: text.bodyMedium?.copyWith(
+                    color: context.c.textPrimary,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The composer: a rounded input with a gold circular send button.
+class _CommentComposer extends StatelessWidget {
+  const _CommentComposer({required this.controller, required this.onSend});
+
+  final TextEditingController controller;
+  final VoidCallback onSend;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: context.c.surface,
+              borderRadius: BorderRadius.circular(AppColors.radiusPill),
+              border: Border.all(color: context.c.surfaceLine),
+            ),
+            child: TextField(
+              controller: controller,
+              textInputAction: TextInputAction.send,
+              minLines: 1,
+              maxLines: 4,
+              onSubmitted: (_) => onSend(),
+              style: TextStyle(color: context.c.textPrimary),
+              decoration: const InputDecoration(
+                hintText: 'Tulis komentar',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                isCollapsed: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Material(
+          color: context.c.accent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onSend,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Icon(
+                Icons.send_rounded,
+                color: context.c.textOnAccent,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -218,14 +443,32 @@ class _ImageHeader extends StatelessWidget {
   }
 }
 
-/// The inert Comment / Like / Share row. These are display-only in the mock and
-/// show a short note when tapped rather than performing an action.
-class _ActionRow extends StatelessWidget {
+/// The Comment / Like / Share row. Comment and Like are live in this version;
+/// Share is not built yet and shows a short "coming soon" note when tapped.
+class _ActionRow extends StatefulWidget {
   const _ActionRow();
 
-  void _note(BuildContext context) {
+  @override
+  State<_ActionRow> createState() => _ActionRowState();
+}
+
+class _ActionRowState extends State<_ActionRow> {
+  bool _liked = false;
+
+  void _shareNote() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fitur ini belum aktif pada versi ini.')),
+      const SnackBar(content: Text('Fitur bagikan belum tersedia.')),
+    );
+  }
+
+  void _scrollToComments() {
+    // The comment section sits below in the same scroll view; nudge focus there
+    // by scrolling to the end of the enclosing scrollable.
+    final ScrollableState? scrollable = Scrollable.maybeOf(context);
+    scrollable?.position.animateTo(
+      scrollable.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
     );
   }
 
@@ -244,17 +487,18 @@ class _ActionRow extends StatelessWidget {
           _ActionItem(
             icon: Icons.mode_comment_outlined,
             label: 'Komentar',
-            onTap: () => _note(context),
+            onTap: _scrollToComments,
           ),
           _ActionItem(
-            icon: Icons.favorite_border,
+            icon: _liked ? Icons.favorite : Icons.favorite_border,
             label: 'Suka',
-            onTap: () => _note(context),
+            active: _liked,
+            onTap: () => setState(() => _liked = !_liked),
           ),
           _ActionItem(
             icon: Icons.share_outlined,
             label: 'Bagikan',
-            onTap: () => _note(context),
+            onTap: _shareNote,
           ),
         ],
       ),
@@ -267,24 +511,29 @@ class _ActionItem extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.active = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
+  /// When true the item is tinted with the gold accent (e.g. a liked state).
+  final bool active;
+
   @override
   Widget build(BuildContext context) {
+    final Color color = active ? context.c.accent : context.c.textOnCanvas;
     return TextButton.icon(
       onPressed: onTap,
       style: TextButton.styleFrom(
-        foregroundColor: context.c.textOnCanvas,
+        foregroundColor: color,
       ),
-      icon: Icon(icon, size: 18, color: context.c.textOnCanvas),
+      icon: Icon(icon, size: 18, color: color),
       label: Text(
         label,
         style: TextStyle(
-          color: context.c.textOnCanvas,
+          color: color,
           fontWeight: FontWeight.w600,
           fontSize: 13,
         ),

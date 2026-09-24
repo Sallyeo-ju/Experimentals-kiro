@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/bob_colors.dart';
 import '../../../services/models/learn_models.dart';
+import 'bookmark_button.dart';
 
 /// A compact market-news row for the mixed Belajar feed: a small image on the
 /// left, then source and time, the headline, and read time, matching the
@@ -67,12 +68,16 @@ class ArticleCard extends StatelessWidget {
                         Icon(Icons.circle,
                             size: 3, color: context.c.textSecondary),
                         const SizedBox(width: 6),
-                        Text(
-                          article.timeAgo,
-                          style: text.bodySmall?.copyWith(
-                            color: context.c.textSecondary,
+                        Expanded(
+                          child: Text(
+                            article.timeAgo,
+                            style: text.bodySmall?.copyWith(
+                              color: context.c.textSecondary,
+                            ),
                           ),
                         ),
+                        // Save toggle, aligned to the row's right edge.
+                        BookmarkButton(id: article.id),
                       ],
                     ),
                     const SizedBox(height: 4),
