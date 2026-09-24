@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/models/learn_models.dart';
 import '../../services/providers.dart';
@@ -13,17 +15,29 @@ final FutureProvider<List<LearnVideo>> learnVideosProvider =
   return ref.watch(learnServiceProvider).videos();
 });
 
-/// News articles for the Berita segment.
+/// News articles for the Belajar feed and the in-app reader.
 final FutureProvider<List<LearnArticle>> learnArticlesProvider =
     FutureProvider<List<LearnArticle>>((ref) {
   return ref.watch(learnServiceProvider).articles();
 });
 
+/// Top channels row.
+final FutureProvider<List<LearnChannel>> learnChannelsProvider =
+    FutureProvider<List<LearnChannel>>((ref) {
+  return ref.watch(learnServiceProvider).channels();
+});
+
+/// Which content the feed shows.
+enum _Filter { semua, video, berita }
+
 /// The Belajar (Learn) tab. Replaces the old News tab.
 ///
-/// Two segments: Belajar (educational videos) shown first, and Berita (market
-/// news) second. Videos open on YouTube; news is read in place. Both are backed
-/// by the mock [LearnService].
+/// Blends educational videos and market news in one feed, following the
+/// reference news-app layout: a search field, a Top Kanal channel row, a
+/// featured video carousel (Sorotan), filter chips (Semua / Video / Berita),
+/// and a mixed vertical feed of compact video and article rows. Videos open on
+/// YouTube; articles open an in-app reader. All content is backed by the mock
+/// [LearnService].
 class BelajarScreen extends ConsumerStatefulWidget {
   const BelajarScreen({super.key});
 
@@ -32,49 +46,407 @@ class BelajarScreen extends ConsumerStatefulWidget {
 }
 
 class _BelajarScreenState extends ConsumerState<BelajarScreen> {
-  int _segment = 0;
+  final TextEditingController _search = TextEditingController();
+  _Filter _filter = _Filter.semua;
+  String _query = '';
+
+  /// When set, the feed is scoped to this channel or source name.
+  String? _channel;
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  bool _matchesQuery(String haystack) =>
+      _query.isEmpty || haystack.toLowerCase().contains(_query.toLowerCase());
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AsyncValue<List<LearnVideo>> videos = ref.watch(learnVideosProvider);
+    final AsyncValue<List<LearnArticle>> articles =
+        ref.watch(learnArticlesProvider);
+
     return Scaffold(
       backgroundColor: AppColors.bgBase,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Belajar',
-                    style: text.headlineSmall?.copyWith(
-                      color: AppColors.textOnTeal,
-                      fontWeight: FontWeight.w800,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Belajar',
+                      style: text.headlineSmall?.copyWith(
+                        color: AppColors.textOnTeal,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Video edukasi dan berita pasar untuk investor.',
-                    style: text.bodyMedium
-                        ?.copyWith(color: AppColors.textOnTeal2),
-                  ),
-                  const SizedBox(height: 16),
-                  _SegmentToggle(
-                    index: _segment,
-                    labels: const <String>['Belajar', 'Berita'],
-                    onChanged: (int i) => setState(() => _segment = i),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      'Video edukasi dan berita pasar untuk investor.',
+                      style: text.bodyMedium
+                          ?.copyWith(color: AppColors.textOnTeal2),
+                    ),
+                    const SizedBox(height: 16),
+                    _SearchField(
+                      controller: _search,
+                      onChanged: (String v) => setState(() => _query = v),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: _segment == 0
-                  ? const _VideosList()
-                  : const _ArticlesList(),
+            _buildChannels(),
+            if (_filter != _Filter.berita) _buildFeatured(videos),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: _FilterChips(
+                  active: _filter,
+                  onChanged: (_Filter f) => setState(() => _filter = f),
+                ),
+              ),
+            ),
+            _buildFeed(videos, articles),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChannels() {
+    final AsyncValue<List<LearnChannel>> channels =
+        ref.watch(learnChannelsProvider);
+    return SliverToBoxAdapter(
+      child: channels.maybeWhen(
+        data: (List<LearnChannel> list) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                child: _SectionHeader(title: 'Top Kanal'),
+              ),
+              SizedBox(
+                height: 92,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: list.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  itemBuilder: (context, i) {
+                    final LearnChannel c = list[i];
+                    final bool active = _channel == c.name;
+                    return _ChannelChip(
+                      channel: c,
+                      active: active,
+                      onTap: () => setState(() {
+                        _channel = active ? null : c.name;
+                      }),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        orElse: () => const SizedBox.shrink(),
+      ),
+    );
+  }
+
+  Widget _buildFeatured(AsyncValue<List<LearnVideo>> videos) {
+    return SliverToBoxAdapter(
+      child: videos.maybeWhen(
+        data: (List<LearnVideo> all) {
+          final List<LearnVideo> list = all
+              .where((LearnVideo v) =>
+                  (_channel == null || v.channel == _channel) &&
+                  _matchesQuery('${v.title} ${v.channel}'))
+              .toList();
+          if (list.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: _SectionHeader(title: 'Sorotan'),
+                ),
+                SizedBox(
+                  height: 220,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, i) =>
+                        VideoCard(video: list[i], width: 280),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        orElse: () => const SizedBox.shrink(),
+      ),
+    );
+  }
+
+  Widget _buildFeed(
+    AsyncValue<List<LearnVideo>> videos,
+    AsyncValue<List<LearnArticle>> articles,
+  ) {
+    // Both sources must be ready to compose the mixed feed.
+    if (videos.isLoading || articles.isLoading) {
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 40),
+          child: Center(
+            child: CircularProgressIndicator(color: AppColors.accent),
+          ),
+        ),
+      );
+    }
+    if (videos.hasError || articles.hasError) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          child: Center(
+            child: Text(
+              'Gagal memuat konten. Coba lagi nanti.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: AppColors.bearish),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final List<_FeedItem> items = _composeFeed(
+      videos.value ?? const <LearnVideo>[],
+      articles.value ?? const <LearnArticle>[],
+    );
+
+    if (items.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          child: Center(
+            child: Text(
+              'Tidak ada konten yang cocok.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: AppColors.textOnTeal2),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, i) {
+            final _FeedItem item = items[i];
+            final Widget child = item.video != null
+                ? VideoRow(video: item.video!)
+                : ArticleCard(
+                    article: item.article!,
+                    onTap: () => context.push(
+                      AppRoutes.article(item.article!.id),
+                    ),
+                  );
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: child,
+            );
+          },
+          childCount: items.length,
+        ),
+      ),
+    );
+  }
+
+  /// Builds the interleaved feed honoring the active filter, channel, and query.
+  List<_FeedItem> _composeFeed(
+    List<LearnVideo> videos,
+    List<LearnArticle> articles,
+  ) {
+    final List<LearnVideo> vids = videos
+        .where((LearnVideo v) =>
+            (_channel == null || v.channel == _channel) &&
+            _matchesQuery('${v.title} ${v.channel}'))
+        .toList();
+    final List<LearnArticle> arts = articles
+        .where((LearnArticle a) =>
+            (_channel == null || a.source == _channel) &&
+            _matchesQuery('${a.title} ${a.source}'))
+        .toList();
+
+    switch (_filter) {
+      case _Filter.video:
+        return vids.map(_FeedItem.ofVideo).toList();
+      case _Filter.berita:
+        return arts.map(_FeedItem.ofArticle).toList();
+      case _Filter.semua:
+        // Interleave articles and videos so both are visible without one block
+        // dominating. Articles lead since they read as "latest news".
+        final List<_FeedItem> out = <_FeedItem>[];
+        final int max =
+            arts.length > vids.length ? arts.length : vids.length;
+        for (int i = 0; i < max; i++) {
+          if (i < arts.length) {
+            out.add(_FeedItem.ofArticle(arts[i]));
+          }
+          if (i < vids.length) {
+            out.add(_FeedItem.ofVideo(vids[i]));
+          }
+        }
+        return out;
+    }
+  }
+}
+
+/// A single feed entry: exactly one of [video] or [article] is non-null.
+class _FeedItem {
+  const _FeedItem._({this.video, this.article});
+
+  factory _FeedItem.ofVideo(LearnVideo v) => _FeedItem._(video: v);
+  factory _FeedItem.ofArticle(LearnArticle a) => _FeedItem._(article: a);
+
+  final LearnVideo? video;
+  final LearnArticle? article;
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppColors.textOnTeal,
+            fontWeight: FontWeight.w800,
+          ),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.onChanged});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppColors.radiusPill),
+        border: Border.all(color: AppColors.surfaceLine),
+      ),
+      child: Row(
+        children: <Widget>[
+          const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              textInputAction: TextInputAction.search,
+              style: const TextStyle(color: AppColors.textPrimary),
+              decoration: const InputDecoration(
+                hintText: 'Cari video atau berita',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                isCollapsed: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChannelChip extends StatelessWidget {
+  const _ChannelChip({
+    required this.channel,
+    required this.active,
+    required this.onTap,
+  });
+
+  final LearnChannel channel;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 56,
+              width: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active ? AppColors.accent : AppColors.surface,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: active ? AppColors.accent : AppColors.surfaceLine,
+                  width: 2,
+                ),
+              ),
+              child: Text(
+                channel.initials,
+                style: TextStyle(
+                  color: active
+                      ? AppColors.textOnAccent
+                      : AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              channel.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textOnTeal2,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                  ),
             ),
           ],
         ),
@@ -83,122 +455,47 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
   }
 }
 
-class _VideosList extends ConsumerWidget {
-  const _VideosList();
+class _FilterChips extends StatelessWidget {
+  const _FilterChips({required this.active, required this.onChanged});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<LearnVideo>> videos = ref.watch(learnVideosProvider);
-    return videos.when(
-      data: (List<LearnVideo> list) => ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-        itemCount: list.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 14),
-        itemBuilder: (context, i) => VideoCard(video: list[i]),
-      ),
-      loading: () => const _Loading(),
-      error: (Object err, StackTrace stack) => const _LoadError(),
-    );
-  }
-}
+  final _Filter active;
+  final ValueChanged<_Filter> onChanged;
 
-class _ArticlesList extends ConsumerWidget {
-  const _ArticlesList();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<LearnArticle>> articles =
-        ref.watch(learnArticlesProvider);
-    return articles.when(
-      data: (List<LearnArticle> list) => ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-        itemCount: list.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, i) => ArticleCard(article: list[i]),
-      ),
-      loading: () => const _Loading(),
-      error: (Object err, StackTrace stack) => const _LoadError(),
-    );
-  }
-}
-
-class _SegmentToggle extends StatelessWidget {
-  const _SegmentToggle({
-    required this.index,
-    required this.labels,
-    required this.onChanged,
-  });
-
-  final int index;
-  final List<String> labels;
-  final ValueChanged<int> onChanged;
+  static const List<(_Filter, String)> _options = <(_Filter, String)>[
+    (_Filter.semua, 'Semua'),
+    (_Filter.video, 'Video'),
+    (_Filter.berita, 'Berita'),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.bgElevated,
-        borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.bgSunken),
-      ),
-      child: Row(
-        children: <Widget>[
-          for (int i = 0; i < labels.length; i++)
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onChanged(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: index == i ? AppColors.accent : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppColors.radiusPill),
-                  ),
-                  child: Text(
-                    labels[i],
-                    style: TextStyle(
-                      color: index == i
-                          ? AppColors.textOnAccent
-                          : AppColors.textOnTeal2,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+    return Wrap(
+      spacing: 8,
+      children: _options.map(((_Filter, String) o) {
+        final bool selected = active == o.$1;
+        return GestureDetector(
+          onTap: () => onChanged(o.$1),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.accent : Colors.transparent,
+              borderRadius: BorderRadius.circular(AppColors.radiusPill),
+              border: Border.all(
+                color: selected ? AppColors.accent : AppColors.textOnTeal2,
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Loading extends StatelessWidget {
-  const _Loading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(color: AppColors.accent),
-    );
-  }
-}
-
-class _LoadError extends StatelessWidget {
-  const _LoadError();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Gagal memuat konten. Coba lagi nanti.',
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(color: AppColors.bearish),
-      ),
+            child: Text(
+              o.$2,
+              style: TextStyle(
+                color:
+                    selected ? AppColors.textOnAccent : AppColors.textOnTeal2,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

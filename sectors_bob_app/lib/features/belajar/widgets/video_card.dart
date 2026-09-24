@@ -4,42 +4,51 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/models/learn_models.dart';
 
-/// A learning video row: thumbnail with a play overlay, title, and channel.
+/// Opens a learning video. Real videos launch YouTube in an external app; mock
+/// placeholders show a short note instead of a dead link. Shared by the big
+/// [VideoCard] and the compact [VideoRow] so the behavior stays identical.
+Future<void> openVideo(BuildContext context, LearnVideo video) async {
+  if (!video.isReal) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Ini video contoh untuk pratinjau tampilan.'),
+      ),
+    );
+    return;
+  }
+  final Uri uri = Uri.parse(video.watchUrl);
+  final bool ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  if (!ok && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Tidak bisa membuka video.')),
+    );
+  }
+}
+
+/// A learning video card: thumbnail with a play overlay, title, and channel.
+/// Used in the featured (Sorotan) carousel.
 ///
 /// Real videos open in the YouTube app (or browser) via url_launcher. Mock
 /// placeholders show a "Contoh" chip and a short note when tapped instead of
 /// opening a dead link, so the tab is honest about which entries are real.
 class VideoCard extends StatelessWidget {
-  const VideoCard({super.key, required this.video});
+  const VideoCard({super.key, required this.video, this.width});
 
   final LearnVideo video;
 
-  Future<void> _open(BuildContext context) async {
-    if (!video.isReal) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ini video contoh untuk pratinjau tampilan.'),
-        ),
-      );
-      return;
-    }
-    final Uri uri = Uri.parse(video.watchUrl);
-    final bool ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tidak bisa membuka video.')),
-      );
-    }
-  }
+  /// Optional fixed width, used when laid out horizontally in the carousel.
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
-    return Material(
+    return SizedBox(
+      width: width,
+      child: Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppColors.radiusCard),
       child: InkWell(
-        onTap: () => _open(context),
+        onTap: () => openVideo(context, video),
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
         child: Container(
           decoration: BoxDecoration(
@@ -87,6 +96,140 @@ class VideoCard extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      ),
+    );
+  }
+}
+
+/// A compact video row for the mixed feed: small thumbnail on the left, title
+/// and channel on the right, matching the recommendation rows in the reference.
+class VideoRow extends StatelessWidget {
+  const VideoRow({super.key, required this.video});
+
+  final LearnVideo video;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppColors.radiusCard),
+      child: InkWell(
+        onTap: () => openVideo(context, video),
+        borderRadius: BorderRadius.circular(AppColors.radiusCard),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppColors.radiusCard),
+            border: Border.all(color: AppColors.surfaceLine),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppColors.radiusSmall),
+                child: SizedBox(
+                  width: 120,
+                  height: 72,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      if (video.isReal)
+                        Image.network(
+                          video.thumbnailUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stack) =>
+                              const _ThumbFallback(),
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) {
+                              return child;
+                            }
+                            return const _ThumbFallback();
+                          },
+                        )
+                      else
+                        const _ThumbFallback(),
+                      const Center(
+                        child: Icon(
+                          Icons.play_circle_fill,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        const Icon(
+                          Icons.play_circle_outline,
+                          size: 13,
+                          color: AppColors.accentPress,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Video  .  ${video.durationLabel}',
+                          style: text.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (!video.isReal) ...<Widget>[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceAlt,
+                              borderRadius:
+                                  BorderRadius.circular(AppColors.radiusPill),
+                            ),
+                            child: Text(
+                              'Contoh',
+                              style: text.bodySmall?.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      video.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodyMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      video.channel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),

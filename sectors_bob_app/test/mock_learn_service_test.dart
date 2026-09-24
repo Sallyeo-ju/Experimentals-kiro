@@ -27,12 +27,31 @@ void main() {
       }
     });
 
-    test('returns market news articles', () async {
+    test('returns market news articles with reader body and unique ids',
+        () async {
       final List<LearnArticle> articles = await service.articles();
       expect(articles, isNotEmpty);
+
+      final Set<String> ids = <String>{};
       for (final LearnArticle a in articles) {
         expect(a.title, isNotEmpty);
         expect(a.source, isNotEmpty);
+        expect(a.id, isNotEmpty);
+        expect(a.body, isNotEmpty, reason: 'reader needs body paragraphs');
+        expect(a.readTime, isNotEmpty);
+        ids.add(a.id);
+      }
+      expect(ids, hasLength(articles.length), reason: 'ids must be unique');
+    });
+
+    test('returns channels for both videos and news', () async {
+      final List<LearnChannel> channels = await service.channels();
+      expect(channels, isNotEmpty);
+      expect(channels.any((LearnChannel c) => c.isVideo), isTrue);
+      expect(channels.any((LearnChannel c) => !c.isVideo), isTrue);
+      // Initials are derived and never empty.
+      for (final LearnChannel c in channels) {
+        expect(c.initials, isNotEmpty);
       }
     });
   });
