@@ -186,7 +186,11 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
                   child: _SectionHeader(title: 'Sorotan'),
                 ),
                 SizedBox(
-                  height: 220,
+                  // 280-wide cards render a 16:9 thumbnail (~158px) plus the
+                  // title/channel block (~90px), so the intrinsic card height is
+                  // ~250px. The old 220px box clipped that by ~30px; 252 gives
+                  // the content room without a visible gap.
+                  height: 252,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),

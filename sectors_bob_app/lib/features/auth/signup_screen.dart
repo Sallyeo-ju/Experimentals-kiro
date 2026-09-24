@@ -67,7 +67,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 12),
-              const Center(child: AppLogo(size: 72)),
+              const Center(child: AppLogo(size: 220)),
               const SizedBox(height: 28),
               Container(
                 padding: const EdgeInsets.all(22),
