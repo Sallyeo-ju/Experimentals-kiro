@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/user_models.dart';
 import '../../services/providers.dart';
 import '../auth/auth_widgets.dart';
@@ -70,10 +71,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final TextTheme text = Theme.of(context).textTheme;
     final AppUser? user = ref.watch(authStateProvider).value;
 
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
+    return TealBackground(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
         title: const Text('Edit profil'),
@@ -136,6 +138,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

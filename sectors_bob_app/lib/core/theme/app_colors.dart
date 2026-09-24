@@ -69,6 +69,18 @@ class AppColors {
   /// A 14 percent wash of [bearish], matching `rgba(255,90,77,0.14)`.
   static const Color bearishTint = Color(0x24FF5A4D);
 
+  /// A ~16 percent wash of the gold [accent], used as the active-tab pill in
+  /// the bottom navigation so the selected item glows gold without a hard fill.
+  static const Color accentTint = Color(0x29E9B84A);
+
+  /// Surface color for the slim bottom navigation bar. A lifted teal that reads
+  /// as the bottom edge of the immersive canvas rather than a bright slab, so
+  /// the nav no longer clashes with the dark screens above it.
+  static const Color navSurface = Color(0xFF0E3835);
+
+  /// Hairline used as the nav bar's top border.
+  static const Color navBorder = Color(0xFF10403C);
+
   // Brand mark colors. These belong to the BOB logo itself (arrow, loop, and
   // paw print), not to data signals, so they are kept separate from bullish
   // and bearish even though the paw print reads as a warm red. Changing the

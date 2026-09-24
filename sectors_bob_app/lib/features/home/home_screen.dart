@@ -430,7 +430,7 @@ class _AskBar extends StatelessWidget {
               onSubmitted: (_) => onSubmit(),
               style: const TextStyle(color: AppColors.textPrimary),
               decoration: const InputDecoration(
-                hintText: 'Tanya BOB soal saham apa saja',
+                hintText: 'Tanya BOB is this bullish or bearish',
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,

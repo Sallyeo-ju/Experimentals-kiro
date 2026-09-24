@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import 'belajar_screen.dart';
 
@@ -20,10 +21,11 @@ class ArticleDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<LearnArticle>> articles =
         ref.watch(learnArticlesProvider);
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
+    return TealBackground(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
         actions: <Widget>[
@@ -51,6 +53,7 @@ class ArticleDetailScreen extends ConsumerWidget {
           child: CircularProgressIndicator(color: AppColors.accent),
         ),
         error: (Object err, StackTrace stack) => const _NotFound(),
+      ),
       ),
     );
   }

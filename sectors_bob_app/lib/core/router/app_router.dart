@@ -214,7 +214,44 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
+/// One destination in the slim bottom navigation.
+class _NavItem {
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+}
+
+const List<_NavItem> _navItems = <_NavItem>[
+  _NavItem(
+    icon: Icons.school_outlined,
+    activeIcon: Icons.school,
+    label: 'Belajar',
+  ),
+  _NavItem(
+    icon: Icons.home_outlined,
+    activeIcon: Icons.home,
+    label: 'Beranda',
+  ),
+  _NavItem(
+    icon: Icons.auto_awesome_outlined,
+    activeIcon: Icons.auto_awesome,
+    label: 'BOB AI',
+  ),
+];
+
 /// The three-tab shell. Beranda sits in the center as the hero destination.
+///
+/// The bottom bar is a slim, dark-teal custom nav (not the tall Material 3
+/// NavigationBar) so it reads as the bottom edge of the immersive canvas
+/// rather than a bright slab that clashes with the teal screens above. The
+/// active tab is marked with a soft gold pill and gold icon/label, which is
+/// BOB's action color; inactive tabs use the muted on-teal tone.
 class _HomeShell extends StatelessWidget {
   const _HomeShell({required this.navigationShell});
 
@@ -231,51 +268,100 @@ class _HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return const TextStyle(
-                color: AppColors.accentPress,
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-              );
-            }
-            return const TextStyle(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            );
-          }),
-          iconTheme: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return const IconThemeData(color: AppColors.accentPress);
-            }
-            return const IconThemeData(color: AppColors.textSecondary);
-          }),
+      bottomNavigationBar: _SlimNavBar(
+        currentIndex: navigationShell.currentIndex,
+        onTap: _goBranch,
+      ),
+    );
+  }
+}
+
+/// A compact (~62px) dark-teal bottom bar with a gold active state.
+class _SlimNavBar extends StatelessWidget {
+  const _SlimNavBar({required this.currentIndex, required this.onTap});
+
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.navSurface,
+        border: Border(top: BorderSide(color: AppColors.navBorder)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 62,
+          child: Row(
+            children: <Widget>[
+              for (int i = 0; i < _navItems.length; i++)
+                Expanded(
+                  child: _SlimNavTab(
+                    item: _navItems[i],
+                    selected: i == currentIndex,
+                    onTap: () => onTap(i),
+                  ),
+                ),
+            ],
+          ),
         ),
-        child: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: _goBranch,
-          backgroundColor: AppColors.surface,
-          indicatorColor: AppColors.surfaceAlt,
-          destinations: const <NavigationDestination>[
-            NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              selectedIcon: Icon(Icons.school),
-              label: 'Belajar',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Beranda',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.auto_awesome_outlined),
-              selectedIcon: Icon(Icons.auto_awesome),
-              label: 'BOB AI',
-            ),
-          ],
+      ),
+    );
+  }
+}
+
+/// A single tab: an icon over a small label, wrapped in a gold pill when active.
+class _SlimNavTab extends StatelessWidget {
+  const _SlimNavTab({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _NavItem item;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color =
+        selected ? AppColors.accent : AppColors.textOnTeal2;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppColors.radiusPill),
+      splashColor: AppColors.accentTint,
+      highlightColor: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.accentTint : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppColors.radiusPill),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                selected ? item.activeIcon : item.icon,
+                color: color,
+                size: 22,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                item.label,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
