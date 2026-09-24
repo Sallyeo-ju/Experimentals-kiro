@@ -6,6 +6,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../core/widgets/teal_background.dart';
 import 'auth_controller.dart';
 import 'auth_widgets.dart';
 
@@ -46,10 +47,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final bool sent = state.value ?? false;
     final TextTheme text = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
+    return TealBackground(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
       ),
@@ -103,6 +105,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

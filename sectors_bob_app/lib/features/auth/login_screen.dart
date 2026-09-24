@@ -6,6 +6,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/user_models.dart';
 import 'auth_controller.dart';
 import 'auth_widgets.dart';
@@ -56,8 +57,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final String? error = state.hasError ? 'Tidak bisa masuk. Periksa email dan kata sandi, lalu coba lagi.' : null;
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
-      body: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: TealBackground(
+        child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -195,6 +197,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

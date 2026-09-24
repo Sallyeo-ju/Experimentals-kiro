@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/user_models.dart';
 import '../../services/providers.dart';
 import 'settings_providers.dart';
@@ -31,10 +32,11 @@ class ProfileScreen extends ConsumerWidget {
     final AppLanguage language = ref.watch(languageProvider);
     final TextTheme text = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
+    return TealBackground(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
         title: const Text('Profil'),
@@ -120,6 +122,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
