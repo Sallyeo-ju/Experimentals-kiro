@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -116,23 +117,23 @@ class _SparklinePainter extends CustomPainter {
       fullPath.lineTo(pointAt(i).dx, pointAt(i).dy);
     }
 
-    final PathMetrics metrics = fullPath.computeMetrics();
+  final metrics = fullPath.computeMetrics();
     final Path drawnPath = Path();
     double drawnLength = 0;
     double totalLength = 0;
     Offset lastDrawnPoint = pointAt(0);
-    for (final PathMetric metric in metrics) {
+    for (final metric in metrics) {
       totalLength += metric.length;
     }
     final double target = totalLength * progress;
-    for (final PathMetric metric in fullPath.computeMetrics()) {
+    for (final metric in fullPath.computeMetrics()) {
       final double remaining = target - drawnLength;
       if (remaining <= 0) {
         break;
       }
       final double take = remaining < metric.length ? remaining : metric.length;
       drawnPath.addPath(metric.extractPath(0, take), Offset.zero);
-      final Tangent? tan = metric.getTangentForOffset(take);
+      final tan = metric.getTangentForOffset(take);
       if (tan != null) {
         lastDrawnPoint = tan.position;
       }
