@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/bob_colors.dart';
 
 /// A lightweight line chart for the stock detail price history.
 ///
@@ -52,7 +52,7 @@ class _SparklineChartState extends State<SparklineChart>
   Widget build(BuildContext context) {
     final List<double> points = widget.points;
     final bool isUp = points.isNotEmpty && points.last >= points.first;
-    final Color lineColor = isUp ? AppColors.bullish : AppColors.bearish;
+    final Color lineColor = isUp ? context.c.bullish : context.c.bearish;
     return SizedBox(
       height: widget.height,
       width: double.infinity,

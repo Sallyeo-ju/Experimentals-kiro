@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../services/models/analysis_models.dart';
 import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
+
+/// The visual kind of a signal badge, decoupled from the concrete colors so the
+/// badge can resolve mode-aware colors at build time.
+enum _BadgeKind { positive, negative, neutral }
 
 /// A pill badge for DATA signals only.
 ///
@@ -10,42 +15,41 @@ import '../theme/app_colors.dart';
 /// These colors are for data and must never appear on action buttons.
 ///
 /// Set [onSurface] to true when the badge sits on an off-white surface (a
-/// [AppColors.surface] card, chat bubble, or metric row). It swaps to the
-/// darker on-surface data colors over a light tint, matching the palette mock,
-/// instead of the bright-on-near-black pair that only reads well on the teal
-/// canvas. Neutral stays the same on both since it is already surface-friendly.
+/// surface card, chat bubble, or metric row). It swaps to the darker on-surface
+/// data colors over a light tint. On the immersive canvas leave it false for
+/// the brighter pair. Colors are resolved from the active theme so the badge
+/// adapts to light and dark mode.
 class SignalBadge extends StatelessWidget {
   const SignalBadge._({
     required this.label,
-    required this.background,
-    required this.foreground,
+    required this.kind,
+    required this.onSurface,
     this.icon,
   });
 
   /// Builds a badge from an analysis [Signal].
-  factory SignalBadge.signal(Signal signal, {String? label, bool onSurface = false}) {
+  factory SignalBadge.signal(Signal signal,
+      {String? label, bool onSurface = false}) {
     switch (signal) {
       case Signal.bullish:
         return SignalBadge._(
           label: label ?? 'Bullish',
-          background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
-          foreground:
-              onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
+          kind: _BadgeKind.positive,
+          onSurface: onSurface,
           icon: Icons.trending_up,
         );
       case Signal.bearish:
         return SignalBadge._(
           label: label ?? 'Bearish',
-          background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
-          foreground:
-              onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
+          kind: _BadgeKind.negative,
+          onSurface: onSurface,
           icon: Icons.trending_down,
         );
       case Signal.netral:
         return SignalBadge._(
           label: label ?? 'Netral',
-          background: AppColors.surfaceAlt,
-          foreground: AppColors.textSecondary,
+          kind: _BadgeKind.neutral,
+          onSurface: onSurface,
           icon: Icons.trending_flat,
         );
     }
@@ -57,22 +61,20 @@ class SignalBadge extends StatelessWidget {
       case Sentiment.positif:
         return SignalBadge._(
           label: 'Positif',
-          background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
-          foreground:
-              onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
+          kind: _BadgeKind.positive,
+          onSurface: onSurface,
         );
       case Sentiment.negatif:
         return SignalBadge._(
           label: 'Negatif',
-          background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
-          foreground:
-              onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
+          kind: _BadgeKind.negative,
+          onSurface: onSurface,
         );
       case Sentiment.netral:
-        return const SignalBadge._(
+        return SignalBadge._(
           label: 'Netral',
-          background: AppColors.surfaceAlt,
-          foreground: AppColors.textSecondary,
+          kind: _BadgeKind.neutral,
+          onSurface: onSurface,
         );
     }
   }
@@ -87,33 +89,48 @@ class SignalBadge extends StatelessWidget {
     if (changePercent > 0) {
       return SignalBadge._(
         label: label,
-        background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
-        foreground: onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
+        kind: _BadgeKind.positive,
+        onSurface: onSurface,
         icon: Icons.arrow_drop_up,
       );
     }
     if (changePercent < 0) {
       return SignalBadge._(
         label: label,
-        background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
-        foreground: onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
+        kind: _BadgeKind.negative,
+        onSurface: onSurface,
         icon: Icons.arrow_drop_down,
       );
     }
     return SignalBadge._(
       label: label,
-      background: AppColors.surfaceAlt,
-      foreground: AppColors.textSecondary,
+      kind: _BadgeKind.neutral,
+      onSurface: onSurface,
     );
   }
 
   final String label;
-  final Color background;
-  final Color foreground;
+  final _BadgeKind kind;
+  final bool onSurface;
   final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
+    final BobColors c = context.c;
+    late final Color background;
+    late final Color foreground;
+    switch (kind) {
+      case _BadgeKind.positive:
+        background = onSurface ? c.bullishTint : c.bullishSoft;
+        foreground = onSurface ? c.bullishOnSurface : c.bullish;
+      case _BadgeKind.negative:
+        background = onSurface ? c.bearishTint : c.bearishSoft;
+        foreground = onSurface ? c.bearishOnSurface : c.bearish;
+      case _BadgeKind.neutral:
+        background = c.surfaceAlt;
+        foreground = c.textSecondary;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(

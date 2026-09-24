@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/bob_colors.dart';
 import '../../../services/models/learn_models.dart';
 
 /// Opens a learning video. Real videos launch YouTube in an external app; mock
@@ -45,7 +46,7 @@ class VideoCard extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Material(
-      color: AppColors.surface,
+      color: context.c.surface,
       borderRadius: BorderRadius.circular(AppColors.radiusCard),
       child: InkWell(
         onTap: () => openVideo(context, video),
@@ -53,7 +54,7 @@ class VideoCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
-            border: Border.all(color: AppColors.surfaceLine),
+            border: Border.all(color: context.c.surfaceLine),
             boxShadow: AppColors.cardShadowRich,
           ),
           child: Column(
@@ -70,7 +71,7 @@ class VideoCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodyLarge?.copyWith(
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                         fontWeight: FontWeight.w700,
                         height: 1.3,
                       ),
@@ -78,10 +79,10 @@ class VideoCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: <Widget>[
-                        const Icon(
+                        Icon(
                           Icons.play_circle_outline,
                           size: 16,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                         const SizedBox(width: 6),
                         Expanded(
@@ -90,7 +91,7 @@ class VideoCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: text.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.c.textSecondary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -120,7 +121,7 @@ class VideoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     return Material(
-      color: AppColors.surface,
+      color: context.c.surface,
       borderRadius: BorderRadius.circular(AppColors.radiusCard),
       child: InkWell(
         onTap: () => openVideo(context, video),
@@ -129,7 +130,7 @@ class VideoRow extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
-            border: Border.all(color: AppColors.surfaceLine),
+            border: Border.all(color: context.c.surfaceLine),
             boxShadow: AppColors.cardShadow,
           ),
           child: Row(
@@ -176,16 +177,16 @@ class VideoRow extends StatelessWidget {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        const Icon(
+                        Icon(
                           Icons.play_circle_outline,
                           size: 13,
-                          color: AppColors.accentPress,
+                          color: context.c.accentPress,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Video  .  ${video.durationLabel}',
                           style: text.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -195,14 +196,14 @@ class VideoRow extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 1),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceAlt,
+                              color: context.c.surfaceAlt,
                               borderRadius:
                                   BorderRadius.circular(AppColors.radiusPill),
                             ),
                             child: Text(
                               'Contoh',
                               style: text.bodySmall?.copyWith(
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 10,
                               ),
@@ -217,7 +218,7 @@ class VideoRow extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                         fontWeight: FontWeight.w700,
                         height: 1.3,
                       ),
@@ -228,7 +229,7 @@ class VideoRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ],
@@ -315,13 +316,13 @@ class _Thumbnail extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceAlt,
+                    color: context.c.surfaceAlt,
                     borderRadius: BorderRadius.circular(AppColors.radiusPill),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Contoh',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                       fontWeight: FontWeight.w700,
                       fontSize: 11,
                     ),
@@ -340,12 +341,12 @@ class _ThumbFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: AppColors.bgElevated,
+    return ColoredBox(
+      color: context.c.bgElevated,
       child: Center(
         child: Icon(
           Icons.ondemand_video_outlined,
-          color: AppColors.textOnTeal2,
+          color: context.c.textOnCanvas2,
           size: 34,
         ),
       ),

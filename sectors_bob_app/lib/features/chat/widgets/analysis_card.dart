@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/bob_colors.dart';
 import '../../../core/widgets/signal_badge.dart';
 import '../../../services/models/analysis_models.dart';
 
@@ -28,10 +29,10 @@ class AnalysisCard extends StatelessWidget {
       // Material ancestor. Without it, newer Flutter asserts that the
       // ListTile's effects would be hidden by this container's own color.
       child: Material(
-        color: AppColors.surface,
+        color: context.c.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppColors.radiusCard),
-          side: const BorderSide(color: AppColors.surfaceLine),
+          side: BorderSide(color: context.c.surfaceLine),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -46,14 +47,14 @@ class AnalysisCard extends StatelessWidget {
                   analysis.title,
                   style: text.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   analysis.summary,
                   style: text.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                     height: 1.4,
                   ),
                 ),
@@ -127,13 +128,13 @@ class _DetailSection extends StatelessWidget {
         tilePadding: const EdgeInsets.symmetric(horizontal: 16),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        iconColor: AppColors.textSecondary,
-        collapsedIconColor: AppColors.textSecondary,
-        leading: Icon(icon, size: 18, color: AppColors.textSecondary),
+        iconColor: context.c.textSecondary,
+        collapsedIconColor: context.c.textSecondary,
+        leading: Icon(icon, size: 18, color: context.c.textSecondary),
         title: Text(
           title,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: context.c.textSecondary,
             fontWeight: FontWeight.w800,
             fontSize: 12,
             letterSpacing: 0.6,
@@ -174,7 +175,7 @@ class _MetricRow extends StatelessWidget {
                   name,
                   style: text.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -183,7 +184,7 @@ class _MetricRow extends StatelessWidget {
                 value,
                 style: text.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(width: 8),
@@ -194,7 +195,7 @@ class _MetricRow extends StatelessWidget {
           Text(
             interpretation,
             style: text.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               height: 1.35,
             ),
           ),
@@ -221,7 +222,7 @@ class _NewsRow extends StatelessWidget {
           Text(
             headline.title,
             style: text.bodyMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               height: 1.35,
             ),
           ),
@@ -231,7 +232,7 @@ class _NewsRow extends StatelessWidget {
               Text(
                 headline.source,
                 style: text.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -257,23 +258,23 @@ class _DyorDisclaimer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       child: CustomPaint(
-        painter: _DashedTopBorderPainter(),
+        painter: _DashedTopBorderPainter(color: context.c.surfaceLine),
         child: Padding(
           padding: const EdgeInsets.only(top: 12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Icon(
+              Icon(
                 Icons.info_outline,
                 size: 16,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   text,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                         height: 1.35,
                       ),
                 ),
@@ -288,12 +289,14 @@ class _DyorDisclaimer extends StatelessWidget {
 
 /// Draws a dashed line along the top edge to separate the disclaimer.
 class _DashedTopBorderPainter extends CustomPainter {
-  const _DashedTopBorderPainter();
+  const _DashedTopBorderPainter({required this.color});
+
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = AppColors.surfaceLine
+      ..color = color
       ..strokeWidth = 1;
     const double dashWidth = 4;
     const double dashGap = 4;
@@ -309,5 +312,6 @@ class _DashedTopBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DashedTopBorderPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DashedTopBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

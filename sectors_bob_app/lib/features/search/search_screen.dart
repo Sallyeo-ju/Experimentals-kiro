@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/stock_models.dart';
@@ -50,7 +51,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
         elevation: 0,
         titleSpacing: 0,
         title: Padding(
@@ -85,13 +86,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.accent),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: context.c.accent),
           ),
-          error: (Object err, StackTrace stack) => const Center(
+          error: (Object err, StackTrace stack) => Center(
             child: Text(
               'Gagal mencari. Coba lagi.',
-              style: TextStyle(color: AppColors.bearish),
+              style: TextStyle(color: context.c.bearish),
             ),
           ),
         ),
@@ -117,13 +118,13 @@ class _SearchField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(left: 14, right: 6),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+          Icon(Icons.search, color: context.c.textSecondary, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -131,7 +132,7 @@ class _SearchField extends StatelessWidget {
               autofocus: true,
               onChanged: onChanged,
               textInputAction: TextInputAction.search,
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(color: context.c.textPrimary),
               decoration: const InputDecoration(
                 hintText: 'Cari saham, misalnya BBCA',
                 border: InputBorder.none,
@@ -147,9 +148,9 @@ class _SearchField extends StatelessWidget {
             IconButton(
               onPressed: onClear,
               visualDensity: VisualDensity.compact,
-              icon: const Icon(
+              icon: Icon(
                 Icons.close,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 size: 20,
               ),
             ),
@@ -173,9 +174,9 @@ class _EmptyResults extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(
+            Icon(
               Icons.search_off,
-              color: AppColors.textOnTeal2,
+              color: context.c.textOnCanvas2,
               size: 40,
             ),
             const SizedBox(height: 12),
@@ -183,7 +184,7 @@ class _EmptyResults extends StatelessWidget {
               'Tidak ada hasil untuk "$query"',
               textAlign: TextAlign.center,
               style: text.titleMedium?.copyWith(
-                color: AppColors.textOnTeal,
+                color: context.c.textOnCanvas,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -191,7 +192,7 @@ class _EmptyResults extends StatelessWidget {
             Text(
               'Coba kata kunci lain atau kode saham.',
               textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+              style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
             ),
           ],
         ),

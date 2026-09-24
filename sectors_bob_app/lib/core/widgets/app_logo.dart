@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
 
 /// The BOB logo widget that renders the brand logo image asset.
 class AppLogo extends StatelessWidget {
@@ -31,9 +31,9 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final BobColors c = context.c;
     final bool displaySubtitle = showSubtitle && showWordmark;
-    final Color subColor =
-        onTeal ? AppColors.textOnTeal2 : AppColors.textSecondary;
+    final Color subColor = onTeal ? c.textOnCanvas2 : c.textSecondary;
 
     final Widget logoImage = Image.asset(
       assetPath,
@@ -44,7 +44,7 @@ class AppLogo extends StatelessWidget {
         return Icon(
           Icons.interests_rounded,
           size: size,
-          color: onTeal ? AppColors.textOnTeal : AppColors.textPrimary,
+          color: onTeal ? c.textOnCanvas : c.textPrimary,
         );
       },
     );

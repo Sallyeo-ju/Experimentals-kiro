@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/profile/settings_providers.dart';
 
 void main() {
   runApp(const ProviderScope(child: BobApp()));
@@ -15,10 +16,16 @@ class BobApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    // The Profile toggle drives this: true = dark (default), false = light.
+    // Both themes are provided and Flutter switches between them by themeMode,
+    // so flipping the switch re-themes the whole app instantly.
+    final bool isDark = ref.watch(isDarkModeProvider);
     return MaterialApp.router(
       title: 'BOB',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       scrollBehavior: const _NoScrollbarBehavior(),
       routerConfig: router,
     );
