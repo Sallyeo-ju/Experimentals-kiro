@@ -55,13 +55,20 @@ Highlights:
 
 ### Belajar tab (replaces the old News tab)
 
-- Two segments: Belajar (educational videos, shown first) and Berita (market
-  news).
+- A single blended feed of educational videos and market news, following a
+  news-app layout: a search field, a Top Kanal channel row, a featured video
+  carousel (Sorotan), filter chips (Semua / Video / Berita), and a mixed
+  vertical feed of compact video and article rows.
+- Tapping a channel in Top Kanal scopes the feed to that channel or source;
+  tapping again clears it. Search filters both videos and articles.
 - Videos are backed by the mock `LearnService`. One entry is a genuine, verified
   public video from the official Indonesia Stock Exchange (IDX) YouTube channel
   and opens YouTube (via `url_launcher`, external application mode). The rest are
   illustrative placeholders labelled "Contoh" that do not open a link, so the
   tab is honest about what is real.
+- Tapping an article opens an in-app reader (`ArticleDetailScreen`) with an
+  image header, source badge, full body text, and an inert Comment / Like /
+  Share row (display only, no backend).
 
 ### Forgot Password
 
@@ -138,7 +145,7 @@ lib/
     profile/      profile, edit profile, and settings
     chat/         AI chat with structured analysis cards
     stock_detail/ price block, sparkline chart, sections
-    belajar/      Belajar tab: educational videos and market news
+    belajar/      Belajar tab: blended videos and news feed + in-app reader
   main.dart     app entry point
 ```
 

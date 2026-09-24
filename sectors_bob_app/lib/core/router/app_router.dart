@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
+import '../../features/belajar/article_detail_screen.dart';
 import '../../features/belajar/belajar_screen.dart';
 import '../../features/chat/chat_screen.dart';
 import '../../features/home/home_screen.dart';
@@ -34,6 +35,10 @@ class AppRoutes {
   /// Belajar tab (videos and news). Replaces the old news route as the first
   /// shell branch.
   static const String belajar = '/belajar';
+
+  /// The in-app article reader. Navigate with '/article/art-ihsg'.
+  static const String articlePattern = '/article/:id';
+  static String article(String id) => '/article/$id';
   static const String home = '/home';
   static const String ai = '/ai';
 
@@ -168,6 +173,14 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.editProfile,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.articlePattern,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final String id = state.pathParameters['id'] ?? '';
+          return ArticleDetailScreen(articleId: id);
+        },
       ),
       GoRoute(
         path: AppRoutes.stockPattern,
