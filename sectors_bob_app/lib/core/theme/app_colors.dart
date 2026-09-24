@@ -41,10 +41,28 @@ class AppColors {
   static const Color bearishSoft = Color(0xFF3A1614);
   static const Color neutral = Color(0xFF9AA8A6);
 
+  // Brand mark colors. These belong to the BOB logo itself (arrow, loop, and
+  // paw print), not to data signals, so they are kept separate from bullish
+  // and bearish even though the paw print reads as a warm red. Changing the
+  // portfolio number or a stock price never uses these.
+  static const Color brandMark = Color(0xFF4E9E8B);
+  static const Color brandPaw = Color(0xFFB1382B);
+
   // Radii.
   static const double radiusCard = 18.0;
   static const double radiusSmall = 12.0;
 
   /// Fully rounded pill shape used by primary buttons.
   static const double radiusPill = 999.0;
+
+  /// Soft drop shadow used under off-white cards so they lift off the teal
+  /// canvas instead of sitting flush against it. Kept subtle on purpose, this
+  /// is a separation cue, not a heavy Material elevation look.
+  static const List<BoxShadow> cardShadow = <BoxShadow>[
+    BoxShadow(
+      color: Color(0x1F000000),
+      blurRadius: 16,
+      offset: Offset(0, 6),
+    ),
+  ];
 }

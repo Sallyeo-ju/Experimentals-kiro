@@ -23,6 +23,7 @@ class AnalysisCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
         border: Border.all(color: AppColors.surfaceLine),
+        boxShadow: AppColors.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// The BOB logo mark: a rounded square split diagonally into a green half and a
-/// red half, echoing the up/down data signals, next to the BOB wordmark.
+/// The BOB logo mark: an arrow curling into a loop, with a small paw print
+/// badge sitting inside the loop, next to the BOB wordmark.
 ///
-/// The split square is decorative branding, not a data readout, so it is the one
-/// place the signal colors sit side by side outside of data rows.
+/// This uses dedicated brand colors ([AppColors.brandMark] and
+/// [AppColors.brandPaw]), not the bullish and bearish data colors, so the logo
+/// never reads as a stock signal. Green and red stay reserved for data.
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
@@ -35,11 +36,8 @@ class AppLogo extends StatelessWidget {
     final Widget mark = SizedBox(
       height: size,
       width: size,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(size * 0.24),
-        child: CustomPaint(
-          painter: _SplitSquarePainter(),
-        ),
+      child: CustomPaint(
+        painter: _ArrowLoopPawPainter(),
       ),
     );
 
@@ -83,28 +81,84 @@ class AppLogo extends StatelessWidget {
   }
 }
 
-/// Paints the two-tone split square used by the logo mark.
-class _SplitSquarePainter extends CustomPainter {
+/// Paints the BOB mark: an arrow rising then curling into a loop shaped like a
+/// lowercase b, with a small paw print sitting inside the loop.
+///
+/// The stroke is drawn with round caps and joins so it reads as one continuous
+/// shape, similar to the reference logo. Proportions are relative to [size] so
+/// the mark stays crisp at every scale the app uses (splash, auth header).
+class _ArrowLoopPawPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint greenPaint = Paint()..color = AppColors.bullish;
-    final Paint redPaint = Paint()..color = AppColors.bearish;
+    final double s = size.shortestSide;
+    final double strokeWidth = s * 0.13;
 
-    // Top-left triangle in green, bottom-right triangle in red.
-    final Path greenPath = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(0, size.height)
-      ..close();
-    final Path redPath = Path()
-      ..moveTo(size.width, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
+    final Paint markPaint = Paint()
+      ..color = AppColors.brandMark
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawPath(greenPath, greenPaint);
-    canvas.drawPath(redPath, redPaint);
+    // The loop sits in the lower two thirds of the mark, like the bowl of a
+    // lowercase b. The stem rises from the top of the loop and kinks left into
+    // an arrowhead near the top, echoing the upward arrow in the reference mark.
+    final Rect loopRect = Rect.fromCircle(
+      center: Offset(s * 0.52, s * 0.62),
+      radius: s * 0.28,
+    );
+
+    final Path loopPath = Path()
+      ..addArc(loopRect, _degToRad(-40), _degToRad(300));
+    canvas.drawPath(loopPath, markPaint);
+
+    final Path stemPath = Path()
+      ..moveTo(s * 0.30, s * 0.62)
+      ..lineTo(s * 0.30, s * 0.20)
+      ..lineTo(s * 0.16, s * 0.20);
+    canvas.drawPath(stemPath, markPaint);
+
+    // Arrowhead at the top of the stem.
+    final Path arrowPath = Path()
+      ..moveTo(s * 0.28, s * 0.08)
+      ..lineTo(s * 0.16, s * 0.20)
+      ..lineTo(s * 0.28, s * 0.32);
+    canvas.drawPath(arrowPath, markPaint);
+
+    _paintPaw(canvas, center: Offset(s * 0.56, s * 0.64), scale: s * 0.20);
   }
+
+  /// Paints a small paw print: one round pad plus three toe pads above it.
+  void _paintPaw(Canvas canvas, {required Offset center, required double scale}) {
+    final Paint pawPaint = Paint()..color = AppColors.brandPaw;
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center + Offset(0, scale * 0.28),
+        width: scale * 0.78,
+        height: scale * 0.62,
+      ),
+      pawPaint,
+    );
+
+    const List<Offset> toeOffsets = <Offset>[
+      Offset(-0.36, -0.30),
+      Offset(0.0, -0.42),
+      Offset(0.36, -0.30),
+    ];
+    for (final Offset toe in toeOffsets) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: center + Offset(toe.dx * scale, toe.dy * scale),
+          width: scale * 0.30,
+          height: scale * 0.38,
+        ),
+        pawPaint,
+      );
+    }
+  }
+
+  double _degToRad(double degrees) => degrees * 3.14159265 / 180;
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
