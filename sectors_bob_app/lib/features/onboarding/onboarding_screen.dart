@@ -103,12 +103,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        // Weighted spacers instead of plain centering. More
+                        // room sits above the content, near the already open
+                        // Lewati row, and less sits below it, so the block
+                        // reads closer to the dots instead of leaving a bare
+                        // gap right before them.
+                        const Spacer(flex: 3),
                         Container(
-                          height: 72,
-                          width: 72,
+                          height: 80,
+                          width: 80,
                           decoration: BoxDecoration(
                             color: AppColors.bgElevated,
                             borderRadius:
@@ -117,10 +122,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: Icon(
                             slide.icon,
                             color: AppColors.accent,
-                            size: 34,
+                            size: 36,
                           ),
                         ),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 24),
                         Text(
                           slide.title,
                           style: text.headlineSmall?.copyWith(
@@ -128,7 +133,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         Text(
                           slide.body,
                           style: text.bodyLarge?.copyWith(
@@ -136,6 +141,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             height: 1.5,
                           ),
                         ),
+                        const Spacer(flex: 2),
                       ],
                     ),
                   );

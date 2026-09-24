@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/format/formatters.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/widgets/signal_badge.dart';
 import '../../services/models/stock_models.dart';
 import 'home_providers.dart';
 import 'widgets/stock_card.dart';
@@ -19,9 +17,11 @@ const List<String> _suggestedQuestions = <String>[
 
 /// The Home (Beranda) hero screen.
 ///
-/// Teal canvas with an ask-BOB entry bar, suggested questions, a portfolio
-/// summary, and lists of local stocks, favorites, and recent history sourced
-/// from the mock stock service.
+/// Teal canvas with an ask-BOB entry bar, suggested questions, and lists of
+/// local stocks, favorites, and recent history sourced from the mock stock
+/// service. BOB is an information and analysis tool, not a broker or a
+/// portfolio tracker, so nothing here implies holdings or gains that are not
+/// real.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -61,8 +61,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               sliver: SliverList(
                 delegate: SliverChildListDelegate(<Widget>[
-                  const _PortfolioCard(),
-                  const SizedBox(height: 24),
                   _StockSection(
                     title: 'Saham Lokal',
                     provider: localStocksProvider,
@@ -217,59 +215,6 @@ class _SuggestedQuestions extends StatelessWidget {
           ),
         );
       }).toList(),
-    );
-  }
-}
-
-/// The Portofolio Saya summary card. Mock totals rendered with data colors.
-class _PortfolioCard extends StatelessWidget {
-  const _PortfolioCard();
-
-  static const double _totalValue = 24850000;
-  static const double _dayChangePercent = 0.86;
-  static const double _dayChangeValue = 212000;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme text = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.bgElevated,
-        borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.bgSunken),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Portofolio Saya',
-            style: text.titleSmall?.copyWith(color: AppColors.textOnTeal2),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            Formatters.rupiah(_totalValue),
-            style: text.headlineMedium?.copyWith(
-              color: AppColors.textOnTeal,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: <Widget>[
-              SignalBadge.change(
-                changePercent: _dayChangePercent,
-                label: Formatters.percent(_dayChangePercent),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${Formatters.signedRupiah(_dayChangeValue)} hari ini',
-                style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

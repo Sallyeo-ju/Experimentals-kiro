@@ -7,6 +7,14 @@ import '../../services/models/stock_models.dart';
 import 'chat_controller.dart';
 import 'widgets/analysis_card.dart';
 
+/// Example prompts shown in the empty chat state, mirroring the tone of the
+/// suggestions on Home so the two entry points feel like one product.
+const List<String> _emptyStateQuestions = <String>[
+  'Bagaimana TLKM hari ini?',
+  'Bandingkan BBCA dan BBRI',
+  'Jelaskan apa itu RSI',
+];
+
 /// The AI chat screen.
 ///
 /// Teal conversation canvas with a header, a scrolling message list, an animated
@@ -93,7 +101,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             const _ChatHeader(),
             Expanded(
               child: messages.isEmpty
-                  ? const _EmptyState()
+                  ? _EmptyState(
+                      onSelected: (String q) {
+                        ref.read(chatControllerProvider.notifier).sendMessage(q);
+                      },
+                    )
                   : ListView.separated(
                       controller: _scroll,
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -182,43 +194,83 @@ class _ChatHeader extends StatelessWidget {
   }
 }
 
-/// Shown before any message is sent.
+/// Shown before any message is sent. Carries the same suggested-question
+/// pattern as Home so the empty tab is not just a blank teal field.
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({required this.onSelected});
+
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Icon(
-              Icons.auto_awesome_outlined,
-              color: AppColors.accent,
-              size: 40,
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Icon(
+                  Icons.auto_awesome_outlined,
+                  color: AppColors.accent,
+                  size: 36,
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Tanya saham apa saja',
+                  textAlign: TextAlign.center,
+                  style: text.titleMedium?.copyWith(
+                    color: AppColors.textOnTeal,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Dapat jawaban yang dimengerti, lengkap dengan sinyal '
+                  'teknikal, fundamental, dan berita.',
+                  textAlign: TextAlign.center,
+                  style:
+                      text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+                ),
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _emptyStateQuestions.map((String q) {
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(AppColors.radiusPill),
+                      onTap: () => onSelected(q),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(AppColors.radiusPill),
+                          border: Border.all(color: AppColors.accent),
+                        ),
+                        child: Text(
+                          q,
+                          style: const TextStyle(
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Tanya saham apa saja',
-              textAlign: TextAlign.center,
-              style: text.titleMedium?.copyWith(
-                color: AppColors.textOnTeal,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Dapat jawaban yang dimengerti, lengkap dengan sinyal teknikal, '
-              'fundamental, dan berita.',
-              textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

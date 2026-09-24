@@ -36,6 +36,7 @@ class StockCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
             border: Border.all(color: AppColors.surfaceLine),
+            boxShadow: AppColors.cardShadow,
           ),
           child: Row(
             children: <Widget>[

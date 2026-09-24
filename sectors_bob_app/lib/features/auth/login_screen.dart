@@ -72,6 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusCard),
                   border: Border.all(color: AppColors.surfaceLine),
+                  boxShadow: AppColors.cardShadow,
                 ),
                 child: Form(
                   key: _formKey,

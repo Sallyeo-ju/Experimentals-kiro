@@ -75,6 +75,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusCard),
                   border: Border.all(color: AppColors.surfaceLine),
+                  boxShadow: AppColors.cardShadow,
                 ),
                 child: Form(
                   key: _formKey,

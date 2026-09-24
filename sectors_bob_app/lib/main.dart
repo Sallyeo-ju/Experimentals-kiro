@@ -19,7 +19,25 @@ class BobApp extends ConsumerWidget {
       title: 'BOB',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      scrollBehavior: const _NoScrollbarBehavior(),
       routerConfig: router,
     );
+  }
+}
+
+/// Removes the always-on scrollbar track that Material draws on scrollable
+/// screens by default. BOB's lists are short and the teal canvas makes the
+/// default indicator read as a stray grey stripe, so screens scroll without
+/// drawing a track.
+class _NoScrollbarBehavior extends MaterialScrollBehavior {
+  const _NoScrollbarBehavior();
+
+  @override
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }
