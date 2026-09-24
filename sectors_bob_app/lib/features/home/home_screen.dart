@@ -5,10 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/models/stock_models.dart';
+import '../../services/models/user_models.dart';
+import '../../services/providers.dart';
 import 'home_providers.dart';
 import 'widgets/stock_card.dart';
 
-/// Suggested questions shown in the ask-BOB area. Natural, everyday phrasing.
+/// Suggested questions shown in the Tanya BOB card. Natural, everyday phrasing.
 const List<String> _suggestedQuestions = <String>[
   'Bagaimana BBCA hari ini?',
   'Bandingkan BBRI dan BMRI',
@@ -17,11 +19,11 @@ const List<String> _suggestedQuestions = <String>[
 
 /// The Home (Beranda) hero screen.
 ///
-/// Teal canvas with an ask-BOB entry bar, suggested questions, and lists of
-/// local stocks, favorites, and recent history sourced from the mock stock
-/// service. BOB is an information and analysis tool, not a broker or a
-/// portfolio tracker, so nothing here implies holdings or gains that are not
-/// real.
+/// Teal canvas with a top bar (a stock search field with the profile avatar to
+/// its right), a Tanya BOB card that opens the chat, a Favorit/Discover toggle,
+/// and the matching stock lists sourced from the mock stock service. BOB is an
+/// information and analysis tool, not a broker or portfolio tracker, so nothing
+/// here implies holdings or gains that are not real.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -31,6 +33,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _ask = TextEditingController();
+
+  /// 0 = Favorit, 1 = Discover.
+  int _tab = 1;
 
   @override
   void dispose() {
@@ -61,26 +66,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               sliver: SliverList(
                 delegate: SliverChildListDelegate(<Widget>[
-                  _StockSection(
-                    title: 'Saham Lokal',
-                    provider: localStocksProvider,
-                    onOpenStock: _openStock,
-                    onAskBob: (String t) => _openChat(ticker: t),
+                  _SegmentToggle(
+                    index: _tab,
+                    labels: const <String>['Favorit', 'Discover'],
+                    onChanged: (int i) => setState(() => _tab = i),
                   ),
-                  const SizedBox(height: 24),
-                  _StockSection(
-                    title: 'Favorit dan Paling Dicari',
-                    provider: favoritesProvider,
-                    onOpenStock: _openStock,
-                    onAskBob: (String t) => _openChat(ticker: t),
-                  ),
-                  const SizedBox(height: 24),
-                  _StockSection(
-                    title: 'Riwayat Terakhir',
-                    provider: recentlySearchedProvider,
-                    onOpenStock: _openStock,
-                    onAskBob: (String t) => _openChat(ticker: t),
-                  ),
+                  const SizedBox(height: 20),
+                  if (_tab == 0)
+                    _FavoritesTab(
+                      onOpenStock: _openStock,
+                      onAskBob: (String t) => _openChat(ticker: t),
+                    )
+                  else
+                    _DiscoverTab(
+                      onOpenStock: _openStock,
+                      onAskBob: (String t) => _openChat(ticker: t),
+                    ),
                 ]),
               ),
             ),
@@ -92,13 +93,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AppUser? user = ref.watch(authStateProvider).value;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _SearchBar(
+                  onTap: () => context.push(AppRoutes.search),
+                ),
+              ),
+              const SizedBox(width: 12),
+              _ProfileAvatar(
+                user: user,
+                onTap: () => context.push(AppRoutes.profile),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
           Text(
-            'Halo, investor',
+            'Halo, ${user?.displayName.split(' ').first ?? 'investor'}',
             style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
           ),
           const SizedBox(height: 2),
@@ -110,10 +127,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _AskBar(controller: _ask, onSubmit: _submitAsk),
-          const SizedBox(height: 12),
-          _SuggestedQuestions(
-            onSelected: (String q) => _openChat(seed: q),
+          _AskBobCard(
+            controller: _ask,
+            onSubmit: _submitAsk,
+            onSuggestion: (String q) => _openChat(seed: q),
           ),
         ],
       ),
@@ -121,8 +138,250 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// The pinned ask-BOB field. Tapping the send affordance opens the chat, passing
-/// along whatever the user typed.
+/// The Discover tab: local stocks and recent history.
+class _DiscoverTab extends StatelessWidget {
+  const _DiscoverTab({required this.onOpenStock, required this.onAskBob});
+
+  final ValueChanged<String> onOpenStock;
+  final ValueChanged<String> onAskBob;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        _StockSection(
+          title: 'Saham Lokal',
+          provider: localStocksProvider,
+          onOpenStock: onOpenStock,
+          onAskBob: onAskBob,
+        ),
+        const SizedBox(height: 24),
+        _StockSection(
+          title: 'Riwayat Terakhir',
+          provider: recentlySearchedProvider,
+          onOpenStock: onOpenStock,
+          onAskBob: onAskBob,
+        ),
+      ],
+    );
+  }
+}
+
+/// The Favorit tab: favorited stocks with a friendly empty state.
+class _FavoritesTab extends ConsumerWidget {
+  const _FavoritesTab({required this.onOpenStock, required this.onAskBob});
+
+  final ValueChanged<String> onOpenStock;
+  final ValueChanged<String> onAskBob;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<List<Stock>> favorites =
+        ref.watch(favoriteStocksProvider);
+    final TextTheme text = Theme.of(context).textTheme;
+    return favorites.when(
+      data: (List<Stock> list) {
+        if (list.isEmpty) {
+          return const _FavoritesEmpty();
+        }
+        return Column(
+          children: <Widget>[
+            for (int i = 0; i < list.length; i++) ...<Widget>[
+              StockCard(
+                stock: list[i],
+                onTap: () => onOpenStock(list[i].ticker),
+                onAskBob: () => onAskBob(list[i].ticker),
+              ),
+              if (i != list.length - 1) const SizedBox(height: 10),
+            ],
+          ],
+        );
+      },
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      ),
+      error: (Object err, StackTrace stack) => Text(
+        'Gagal memuat favorit. Coba lagi nanti.',
+        style: text.bodyMedium?.copyWith(color: AppColors.bearish),
+      ),
+    );
+  }
+}
+
+class _FavoritesEmpty extends StatelessWidget {
+  const _FavoritesEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      decoration: BoxDecoration(
+        color: AppColors.bgElevated,
+        borderRadius: BorderRadius.circular(AppColors.radiusCard),
+        border: Border.all(color: AppColors.bgSunken),
+      ),
+      child: Column(
+        children: <Widget>[
+          const Icon(Icons.favorite_border,
+              color: AppColors.accent, size: 36),
+          const SizedBox(height: 12),
+          Text(
+            'Belum ada favorit',
+            style: text.titleMedium?.copyWith(
+              color: AppColors.textOnTeal,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Ketuk ikon hati pada saham untuk menyimpannya di sini.',
+            textAlign: TextAlign.center,
+            style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The read-only search bar on Home. Tapping it opens the full search screen.
+class _SearchBar extends StatelessWidget {
+  const _SearchBar({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppColors.radiusPill),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppColors.radiusPill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppColors.radiusPill),
+            border: Border.all(color: AppColors.surfaceLine),
+          ),
+          child: Row(
+            children: <Widget>[
+              const Icon(Icons.search,
+                  color: AppColors.textSecondary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Cari saham',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The circular profile avatar to the right of the search bar.
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({required this.user, required this.onTap});
+
+  final AppUser? user;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final String initials = _initials(user?.displayName ?? 'Investor');
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        height: 46,
+        width: 46,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: AppColors.accent,
+          shape: BoxShape.circle,
+        ),
+        child: Text(
+          initials,
+          style: const TextStyle(
+            color: AppColors.textOnAccent,
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _initials(String name) {
+    final List<String> parts =
+        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) {
+      return 'IN';
+    }
+    if (parts.length == 1) {
+      final String p = parts.first;
+      return (p.length >= 2 ? p.substring(0, 2) : p).toUpperCase();
+    }
+    return (parts.first[0] + parts[1][0]).toUpperCase();
+  }
+}
+
+/// The Tanya BOB card: an ask field plus suggestion chips that open the chat.
+class _AskBobCard extends StatelessWidget {
+  const _AskBobCard({
+    required this.controller,
+    required this.onSubmit,
+    required this.onSuggestion,
+  });
+
+  final TextEditingController controller;
+  final VoidCallback onSubmit;
+  final ValueChanged<String> onSuggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.bgElevated,
+        borderRadius: BorderRadius.circular(AppColors.radiusCard),
+        border: Border.all(color: AppColors.bgSunken),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const Icon(Icons.auto_awesome,
+                  color: AppColors.accent, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Tanya BOB',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppColors.textOnTeal,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _AskBar(controller: controller, onSubmit: onSubmit),
+          const SizedBox(height: 12),
+          _SuggestedQuestions(onSelected: onSuggestion),
+        ],
+      ),
+    );
+  }
+}
+
+/// The ask-BOB input pill. Submitting opens the chat with the typed prompt.
 class _AskBar extends StatelessWidget {
   const _AskBar({required this.controller, required this.onSubmit});
 
@@ -140,13 +399,12 @@ class _AskBar extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
-          const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: controller,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => onSubmit(),
+              style: const TextStyle(color: AppColors.textPrimary),
               decoration: const InputDecoration(
                 hintText: 'Tanya BOB soal saham apa saja',
                 border: InputBorder.none,
@@ -215,6 +473,60 @@ class _SuggestedQuestions extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+/// The Favorit/Discover pill toggle.
+class _SegmentToggle extends StatelessWidget {
+  const _SegmentToggle({
+    required this.index,
+    required this.labels,
+    required this.onChanged,
+  });
+
+  final int index;
+  final List<String> labels;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.bgElevated,
+        borderRadius: BorderRadius.circular(AppColors.radiusPill),
+        border: Border.all(color: AppColors.bgSunken),
+      ),
+      child: Row(
+        children: <Widget>[
+          for (int i = 0; i < labels.length; i++)
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onChanged(i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: index == i ? AppColors.accent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppColors.radiusPill),
+                  ),
+                  child: Text(
+                    labels[i],
+                    style: TextStyle(
+                      color: index == i
+                          ? AppColors.textOnAccent
+                          : AppColors.textOnTeal2,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

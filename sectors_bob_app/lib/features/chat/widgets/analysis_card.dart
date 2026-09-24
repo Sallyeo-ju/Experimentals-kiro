@@ -20,14 +20,23 @@ class AnalysisCard extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.surfaceLine),
         boxShadow: AppColors.cardShadow,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+      // A Material sits between the decorated container and the inner
+      // ExpansionTiles so their ListTile ink and background paint on a real
+      // Material ancestor. Without it, newer Flutter asserts that the
+      // ListTile's effects would be hidden by this container's own color.
+      child: Material(
+        color: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppColors.radiusCard),
+          side: const BorderSide(color: AppColors.surfaceLine),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
@@ -87,7 +96,8 @@ class AnalysisCard extends StatelessWidget {
             ],
           ),
           _DyorDisclaimer(text: analysis.disclaimer),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -177,7 +187,7 @@ class _MetricRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SignalBadge.signal(signal),
+              SignalBadge.signal(signal, onSurface: true),
             ],
           ),
           const SizedBox(height: 4),
@@ -226,7 +236,7 @@ class _NewsRow extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              SignalBadge.sentiment(headline.sentiment),
+              SignalBadge.sentiment(headline.sentiment, onSurface: true),
             ],
           ),
         ],

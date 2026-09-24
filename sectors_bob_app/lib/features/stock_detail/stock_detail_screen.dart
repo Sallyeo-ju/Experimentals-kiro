@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/format/formatters.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/favorite_button.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/signal_badge.dart';
 import '../../services/models/analysis_models.dart';
@@ -44,6 +45,10 @@ class StockDetailScreen extends ConsumerWidget {
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
         title: Text(ticker),
+        actions: <Widget>[
+          FavoriteButton(ticker: ticker, onTeal: true),
+          const SizedBox(width: 4),
+        ],
       ),
       body: detail.when(
         data: (StockDetail data) => _DetailBody(detail: data),
@@ -406,7 +411,7 @@ class _MetricRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SignalBadge.signal(signal),
+              SignalBadge.signal(signal, onSurface: true),
             ],
           ),
           const SizedBox(height: 4),
@@ -454,7 +459,7 @@ class _NewsRow extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              SignalBadge.sentiment(headline.sentiment),
+              SignalBadge.sentiment(headline.sentiment, onSurface: true),
             ],
           ),
         ],

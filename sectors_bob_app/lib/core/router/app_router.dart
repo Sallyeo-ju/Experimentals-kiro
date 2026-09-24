@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
+import '../../features/belajar/belajar_screen.dart';
 import '../../features/chat/chat_screen.dart';
 import '../../features/home/home_screen.dart';
-import '../../features/news/news_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
+import '../../features/profile/edit_profile_screen.dart';
+import '../../features/profile/profile_screen.dart';
+import '../../features/search/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/stock_detail/stock_detail_screen.dart';
 import '../theme/app_colors.dart';
@@ -23,9 +27,24 @@ class AppRoutes {
 
   /// Sign up. Navigated to from the login screen.
   static const String signup = '/signup';
-  static const String news = '/news';
+
+  /// Forgot password. Navigated to from the login screen.
+  static const String forgotPassword = '/forgot-password';
+
+  /// Belajar tab (videos and news). Replaces the old news route as the first
+  /// shell branch.
+  static const String belajar = '/belajar';
   static const String home = '/home';
   static const String ai = '/ai';
+
+  /// Full-screen stock search, pushed from the Home search bar.
+  static const String search = '/search';
+
+  /// Profile, pushed from the Home avatar.
+  static const String profile = '/profile';
+
+  /// Edit profile, pushed from the profile screen.
+  static const String editProfile = '/profile/edit';
 
   /// Builds the AI tab location, optionally carrying a seed prompt or a ticker
   /// so the chat can open pre-filled. FEAT-003 reads these query parameters.
@@ -49,7 +68,7 @@ class AppRoutes {
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorNews = GlobalKey<NavigatorState>();
+final _shellNavigatorBelajar = GlobalKey<NavigatorState>();
 final _shellNavigatorHome = GlobalKey<NavigatorState>();
 final _shellNavigatorAi = GlobalKey<NavigatorState>();
 
@@ -84,17 +103,21 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.signup,
         builder: (context, state) => const SignupScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return _HomeShell(navigationShell: navigationShell);
         },
         branches: <StatefulShellBranch>[
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorNews,
+            navigatorKey: _shellNavigatorBelajar,
             routes: <RouteBase>[
               GoRoute(
-                path: AppRoutes.news,
-                builder: (context, state) => const NewsScreen(),
+                path: AppRoutes.belajar,
+                builder: (context, state) => const BelajarScreen(),
               ),
             ],
           ),
@@ -130,6 +153,21 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const EditProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.stockPattern,
@@ -190,9 +228,9 @@ class _HomeShell extends StatelessWidget {
           indicatorColor: AppColors.surfaceAlt,
           destinations: const <NavigationDestination>[
             NavigationDestination(
-              icon: Icon(Icons.article_outlined),
-              selectedIcon: Icon(Icons.article),
-              label: 'Berita',
+              icon: Icon(Icons.school_outlined),
+              selectedIcon: Icon(Icons.school),
+              label: 'Belajar',
             ),
             NavigationDestination(
               icon: Icon(Icons.home_outlined),

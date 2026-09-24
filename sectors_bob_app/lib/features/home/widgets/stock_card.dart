@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/format/formatters.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/favorite_button.dart';
 import '../../../core/widgets/signal_badge.dart';
 import '../../../services/models/stock_models.dart';
 
@@ -78,11 +79,13 @@ class StockCard extends StatelessWidget {
                   SignalBadge.change(
                     changePercent: stock.changePercent,
                     label: Formatters.percent(stock.changePercent),
+                    onSurface: true,
                   ),
                 ],
               ),
-              if (onAskBob != null) ...<Widget>[
-                const SizedBox(width: 4),
+              const SizedBox(width: 2),
+              FavoriteButton(ticker: stock.ticker, size: 20),
+              if (onAskBob != null)
                 IconButton(
                   onPressed: onAskBob,
                   tooltip: 'Tanya BOB soal ${stock.ticker}',
@@ -92,7 +95,6 @@ class StockCard extends StatelessWidget {
                     color: AppColors.accentPress,
                   ),
                 ),
-              ],
             ],
           ),
         ),

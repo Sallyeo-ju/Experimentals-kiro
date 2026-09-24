@@ -5,9 +5,15 @@ import '../theme/app_colors.dart';
 
 /// A pill badge for DATA signals only.
 ///
-/// Maps a [Signal] or [Sentiment] to soft background and data-colored text
+/// Maps a [Signal] or [Sentiment] to a soft background and data-colored text
 /// (green for bullish/positive, red for bearish/negative, muted for neutral).
 /// These colors are for data and must never appear on action buttons.
+///
+/// Set [onSurface] to true when the badge sits on an off-white surface (a
+/// [AppColors.surface] card, chat bubble, or metric row). It swaps to the
+/// darker on-surface data colors over a light tint, matching the palette mock,
+/// instead of the bright-on-near-black pair that only reads well on the teal
+/// canvas. Neutral stays the same on both since it is already surface-friendly.
 class SignalBadge extends StatelessWidget {
   const SignalBadge._({
     required this.label,
@@ -17,20 +23,22 @@ class SignalBadge extends StatelessWidget {
   });
 
   /// Builds a badge from an analysis [Signal].
-  factory SignalBadge.signal(Signal signal, {String? label}) {
+  factory SignalBadge.signal(Signal signal, {String? label, bool onSurface = false}) {
     switch (signal) {
       case Signal.bullish:
         return SignalBadge._(
           label: label ?? 'Bullish',
-          background: AppColors.bullishSoft,
-          foreground: AppColors.bullish,
+          background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
+          foreground:
+              onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
           icon: Icons.trending_up,
         );
       case Signal.bearish:
         return SignalBadge._(
           label: label ?? 'Bearish',
-          background: AppColors.bearishSoft,
-          foreground: AppColors.bearish,
+          background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
+          foreground:
+              onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
           icon: Icons.trending_down,
         );
       case Signal.netral:
@@ -44,19 +52,21 @@ class SignalBadge extends StatelessWidget {
   }
 
   /// Builds a badge from a news [Sentiment].
-  factory SignalBadge.sentiment(Sentiment sentiment) {
+  factory SignalBadge.sentiment(Sentiment sentiment, {bool onSurface = false}) {
     switch (sentiment) {
       case Sentiment.positif:
-        return const SignalBadge._(
+        return SignalBadge._(
           label: 'Positif',
-          background: AppColors.bullishSoft,
-          foreground: AppColors.bullish,
+          background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
+          foreground:
+              onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
         );
       case Sentiment.negatif:
-        return const SignalBadge._(
+        return SignalBadge._(
           label: 'Negatif',
-          background: AppColors.bearishSoft,
-          foreground: AppColors.bearish,
+          background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
+          foreground:
+              onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
         );
       case Sentiment.netral:
         return const SignalBadge._(
@@ -72,20 +82,21 @@ class SignalBadge extends StatelessWidget {
   factory SignalBadge.change({
     required double changePercent,
     required String label,
+    bool onSurface = false,
   }) {
     if (changePercent > 0) {
       return SignalBadge._(
         label: label,
-        background: AppColors.bullishSoft,
-        foreground: AppColors.bullish,
+        background: onSurface ? AppColors.bullishTint : AppColors.bullishSoft,
+        foreground: onSurface ? AppColors.bullishOnSurface : AppColors.bullish,
         icon: Icons.arrow_drop_up,
       );
     }
     if (changePercent < 0) {
       return SignalBadge._(
         label: label,
-        background: AppColors.bearishSoft,
-        foreground: AppColors.bearish,
+        background: onSurface ? AppColors.bearishTint : AppColors.bearishSoft,
+        foreground: onSurface ? AppColors.bearishOnSurface : AppColors.bearish,
         icon: Icons.arrow_drop_down,
       );
     }
