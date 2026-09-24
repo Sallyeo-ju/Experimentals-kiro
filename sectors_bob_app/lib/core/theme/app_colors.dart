@@ -35,11 +35,39 @@ class AppColors {
   static const Color textOnAccent = Color(0xFF2A2000);
 
   // Data signals, never on buttons.
+  //
+  // Two sets exist because the same signal has to stay readable on two very
+  // different canvases:
+  //
+  // - [bullish]/[bearish] with the *Soft backgrounds are bright text on a
+  //   near-black tint, tuned for the dark teal canvas.
+  // - [bullishOnSurface]/[bearishOnSurface] with the *Tint backgrounds are
+  //   darker text on a light wash, tuned for the off-white surfaces. These
+  //   match the badge and metric colors in the palette mock (index.html), where
+  //   data on an off-white card reads #12813C green and #C6362C red.
+  //
+  // Picking the wrong pair is a contrast bug, not just a style slip: the dark
+  // *Soft backgrounds turn into near-black blobs when placed on an off-white
+  // card. Prefer `SignalBadge(..., onSurface: true)` on off-white.
   static const Color bullish = Color(0xFF22C55E);
   static const Color bullishSoft = Color(0xFF16351F);
   static const Color bearish = Color(0xFFFF5A4D);
   static const Color bearishSoft = Color(0xFF3A1614);
   static const Color neutral = Color(0xFF9AA8A6);
+
+  /// Bullish green darkened for legibility on off-white surfaces.
+  static const Color bullishOnSurface = Color(0xFF12813C);
+
+  /// Bearish red darkened for legibility on off-white surfaces.
+  static const Color bearishOnSurface = Color(0xFFC6362C);
+
+  /// A 14 percent wash of [bullish], matching `rgba(34,197,94,0.14)` in the
+  /// palette mock. Written as an explicit ARGB constant so it stays `const`
+  /// and avoids the deprecated `withOpacity`.
+  static const Color bullishTint = Color(0x2422C55E);
+
+  /// A 14 percent wash of [bearish], matching `rgba(255,90,77,0.14)`.
+  static const Color bearishTint = Color(0x24FF5A4D);
 
   // Brand mark colors. These belong to the BOB logo itself (arrow, loop, and
   // paw print), not to data signals, so they are kept separate from bullish

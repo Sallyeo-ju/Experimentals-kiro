@@ -11,6 +11,18 @@ class MockStockService implements StockService {
 
   static final Map<String, StockDetail> _details = _buildDetails();
 
+  /// Favorites that a real backend would persist for the user. These always
+  /// come back after a restart. Seeded per the product decision that BBCA and
+  /// TLKM start favorited.
+  static const Set<String> _seededFavorites = <String>{'BBCA', 'TLKM'};
+
+  /// The live favorite set. Starts from the seeded favorites; toggles made in
+  /// the running app mutate this in memory. Because [MockStockService] is
+  /// constructed once by its provider and kept alive, toggles survive tab and
+  /// screen changes within a session, but not a full app restart, which is the
+  /// intended mock behavior: seeded favorites persist, user-added ones do not.
+  final Set<String> _favorites = <String>{..._seededFavorites};
+
   List<Stock> get _all =>
       _details.values.map((detail) => detail.stock).toList(growable: false);
 
@@ -23,10 +35,7 @@ class MockStockService implements StockService {
   @override
   Future<List<Stock>> favorites() async {
     await Future<void>.delayed(_latency);
-    return <Stock>[
-      _details['BBCA']!.stock,
-      _details['TLKM']!.stock,
-    ];
+    return _all.where((Stock s) => _favorites.contains(s.ticker)).toList();
   }
 
   @override
@@ -47,6 +56,28 @@ class MockStockService implements StockService {
       throw StateError('Saham $ticker tidak ditemukan pada data mock.');
     }
     return found;
+  }
+
+  @override
+  Set<String> favoriteTickers() => Set<String>.unmodifiable(_favorites);
+
+  @override
+  void addFavorite(String ticker) => _favorites.add(ticker.toUpperCase());
+
+  @override
+  void removeFavorite(String ticker) => _favorites.remove(ticker.toUpperCase());
+
+  @override
+  Future<List<Stock>> search(String query) async {
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    final String q = query.trim().toLowerCase();
+    if (q.isEmpty) {
+      return _all;
+    }
+    return _all.where((Stock s) {
+      return s.ticker.toLowerCase().contains(q) ||
+          s.name.toLowerCase().contains(q);
+    }).toList();
   }
 
   /// Exposes the raw detail map so the chat mock can reuse the same data.

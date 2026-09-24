@@ -131,7 +131,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         validator: AuthValidators.password,
                       ),
-                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () =>
+                              context.push(AppRoutes.forgotPassword),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.accentPress,
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text('Lupa kata sandi?'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       PrimaryButton(
                         label: 'Masuk',
                         isLoading: isLoading,

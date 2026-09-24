@@ -36,6 +36,28 @@ class AuthController extends AutoDisposeAsyncNotifier<AppUser?> {
   }
 }
 
+/// Drives the forgot-password screen. Holds a simple send state so the screen
+/// can show a spinner during the mock latency and switch to a sent confirmation
+/// on success. Resending re-runs the same call.
+class PasswordResetController extends AutoDisposeAsyncNotifier<bool> {
+  @override
+  Future<bool> build() async => false;
+
+  Future<void> send(String email) async {
+    state = const AsyncValue<bool>.loading();
+    state = await AsyncValue.guard<bool>(() async {
+      await ref.read(authServiceProvider).sendPasswordReset(email.trim());
+      return true;
+    });
+  }
+}
+
+final AutoDisposeAsyncNotifierProvider<PasswordResetController, bool>
+    passwordResetControllerProvider =
+    AsyncNotifierProvider.autoDispose<PasswordResetController, bool>(
+  PasswordResetController.new,
+);
+
 final AutoDisposeAsyncNotifierProvider<AuthController, AppUser?>
     authControllerProvider =
     AsyncNotifierProvider.autoDispose<AuthController, AppUser?>(

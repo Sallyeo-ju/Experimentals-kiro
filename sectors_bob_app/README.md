@@ -9,13 +9,13 @@ swapped for a real API later without touching the UI.
 
 The hero flow, end to end:
 
-Splash to Onboarding to Auth (Login and Sign Up) to Home to AI Chat to Stock
-Detail.
+Splash to Onboarding to Auth (Login, Sign Up, Forgot Password) to Home to AI
+Chat to Stock Detail, plus Profile and the Belajar tab.
 
 Highlights:
 
 - State management with Riverpod.
-- Routing with go_router, including a three-tab bottom shell: Berita, Beranda
+- Routing with go_router, including a three-tab bottom shell: Belajar, Beranda
   (the hero), and BOB AI.
 - Chat responses come back as structured data and are rendered as clean cards
   with progressive disclosure, a thinking indicator, and a mandatory
@@ -24,15 +24,63 @@ Highlights:
   and red are for data signals only.
 - All primary copy is in Bahasa Indonesia.
 
+### Home (Beranda)
+
+- A top bar with a stock search field and the profile avatar to its right.
+  Tapping the avatar opens Profile; tapping the search bar opens a full-screen
+  stock search with live filtering by ticker or company name.
+- A Tanya BOB card (ask field plus suggestion chips) that opens the chat.
+- A Favorit / Discover toggle. Favorit lists favorited stocks with a friendly
+  empty state; Discover lists local stocks and recent history.
+
+### Favorites
+
+- A heart toggle on every stock row and on the Stock Detail app bar. The heart
+  uses the gold accent because favoriting is an action, not a data signal.
+- Seeded favorites (BBCA and TLKM) always come back on a fresh launch, matching
+  what a real backend would persist. Favorites the user adds during a session
+  are kept in memory only and reset on a full restart. This split lives in the
+  mock `StockService`; `FavoritesController` mirrors it as reactive state so
+  every heart and the Favorit list update together.
+
+### Profile
+
+- Shows the signed-in user's name, email, and a Google badge when applicable.
+- Settings: edit profile (updates the display name through
+  `AuthService.updateProfile`), a dark/light theme toggle, a language picker,
+  and sign out, with a version and DYOR footer.
+- The theme and language controls are real, toggleable state but do not repaint
+  the app yet. BOB is dark-first, so light mode carries an honest
+  "Mode terang segera hadir" note rather than a fake switch.
+
+### Belajar tab (replaces the old News tab)
+
+- Two segments: Belajar (educational videos, shown first) and Berita (market
+  news).
+- Videos are backed by the mock `LearnService`. One entry is a genuine, verified
+  public video from the official Indonesia Stock Exchange (IDX) YouTube channel
+  and opens YouTube (via `url_launcher`, external application mode). The rest are
+  illustrative placeholders labelled "Contoh" that do not open a link, so the
+  tab is honest about what is real.
+
+### Forgot Password
+
+- A link on the login screen opens the forgot-password screen. Entering an email
+  and submitting calls the mock `AuthService.sendPasswordReset`, then shows a
+  confirmation with a Resend action. No real email is sent by the mock.
+
 ## Mock service layer
 
 The service layer is fully mocked and sits behind interfaces:
 
-- `AuthService` (email and password, plus a Google button wired to the mock).
-- `StockService` (local stocks, favorites, recently searched, and full detail
-  with chart points, technicals, fundamentals, and news).
+- `AuthService` (email and password, a Google button wired to the mock, plus
+  password reset and profile update).
+- `StockService` (local stocks, favorites with add/remove, recently searched,
+  search, and full detail with chart points, technicals, fundamentals, and
+  news).
 - `ChatService` (send a message, receive a thinking state, then a structured
   analysis).
+- `LearnService` (educational videos and market news for the Belajar tab).
 
 Mock data covers four IDX blue chips: BBCA, BBRI, BMRI, and TLKM. The chat mock
 emits a thinking message first, waits to simulate progressive analysis, then
@@ -60,11 +108,12 @@ needs to produce the same JSON shape defined in
 
 ## Tech stack
 
-- Flutter (Material 3, light mode first).
+- Flutter (Material 3, dark-first: teal canvas with off-white surfaces).
 - Riverpod for state management.
 - go_router for navigation and the three-tab shell.
 - google_fonts for Plus Jakarta Sans.
 - intl for Rupiah and percent formatting in the id_ID locale.
+- url_launcher to open Belajar videos on YouTube.
 
 ## Folder structure
 
@@ -82,11 +131,14 @@ lib/
   features/
     splash/       splash screen
     onboarding/   three onboarding slides
-    auth/         login and sign up
-    home/         Beranda hero screen
+    auth/         login, sign up, and forgot password
+    home/         Beranda hero screen (search, Tanya BOB, Favorit/Discover)
+    search/       full-screen stock search
+    favorites/    reactive favorites controller
+    profile/      profile, edit profile, and settings
     chat/         AI chat with structured analysis cards
     stock_detail/ price block, sparkline chart, sections
-    news/         Berita tab placeholder
+    belajar/      Belajar tab: educational videos and market news
   main.dart     app entry point
 ```
 

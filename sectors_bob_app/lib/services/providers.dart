@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'interfaces/auth_service.dart';
 import 'interfaces/chat_service.dart';
+import 'interfaces/learn_service.dart';
 import 'interfaces/stock_service.dart';
 import 'mock/mock_auth_service.dart';
 import 'mock/mock_chat_service.dart';
+import 'mock/mock_learn_service.dart';
 import 'mock/mock_stock_service.dart';
 import 'models/user_models.dart';
 
@@ -25,6 +27,10 @@ final Provider<StockService> stockServiceProvider = Provider<StockService>((ref)
 
 final Provider<ChatService> chatServiceProvider = Provider<ChatService>((ref) {
   return MockChatService();
+});
+
+final Provider<LearnService> learnServiceProvider = Provider<LearnService>((ref) {
+  return MockLearnService();
 });
 
 /// Streams the current authenticated user, or null when signed out.
