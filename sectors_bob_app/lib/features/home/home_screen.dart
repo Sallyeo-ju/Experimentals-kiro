@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/stock_models.dart';
 import '../../services/models/user_models.dart';
 import '../../services/providers.dart';
@@ -69,13 +70,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
-      body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.accent,
-          backgroundColor: AppColors.surface,
-          onRefresh: _refresh,
-          child: CustomScrollView(
+      backgroundColor: Colors.transparent,
+      body: TealBackground(
+        child: SafeArea(
+          child: RefreshIndicator(
+            color: AppColors.accent,
+            backgroundColor: AppColors.surface,
+            onRefresh: _refresh,
+            child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
             SliverToBoxAdapter(child: _buildHeader(context)),
@@ -102,7 +104,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ]),
               ),
             ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

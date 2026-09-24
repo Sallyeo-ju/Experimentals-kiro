@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_logo.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/providers.dart';
 
 /// The opening screen. Fades the BOB logo in and out on the teal canvas for a
@@ -80,24 +81,37 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
-      body: Center(
-        child: FadeTransition(
-          opacity: _opacity,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const AppLogo(size: 300),
-              const SizedBox(height: 28),
-              Text(
-                'Analisis saham, dalam bahasa manusia',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textOnTeal2,
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
-            ],
+      backgroundColor: Colors.transparent,
+      body: TealBackground(
+        child: Center(
+          child: FadeTransition(
+            opacity: _opacity,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // A faint gold glow sits behind the mark so the hero moment
+                // feels warm rather than floating on flat teal.
+                const SizedBox(
+                  height: 200,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      GlowBlob(size: 300),
+                      AppLogo(size: 180),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  'Analisis saham, dalam bahasa manusia',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.textOnTeal2,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/analysis_models.dart';
 import '../../services/models/stock_models.dart';
 import 'chat_controller.dart';
@@ -95,11 +96,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.bgSunken,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            const _ChatHeader(),
+      backgroundColor: Colors.transparent,
+      body: TealBackground(
+        child: SafeArea(
+          child: Column(
+            children: <Widget>[
+              const _ChatHeader(),
             Expanded(
               child: messages.isEmpty
                   ? _EmptyState(
@@ -126,7 +128,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
             ),
             _ChatInput(controller: _input, onSend: _send),
-          ],
+            ],
+          ),
         ),
       ),
     );

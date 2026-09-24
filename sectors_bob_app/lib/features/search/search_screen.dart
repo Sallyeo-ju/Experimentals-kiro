@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/stock_models.dart';
 import '../../services/providers.dart';
 import '../home/widgets/stock_card.dart';
@@ -44,10 +45,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final AsyncValue<List<Stock>> results =
         ref.watch(searchResultsProvider(_current));
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
+    return TealBackground(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textOnTeal,
         elevation: 0,
         titleSpacing: 0,
@@ -93,6 +95,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
