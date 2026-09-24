@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,9 +7,9 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../services/providers.dart';
 
-/// The opening screen. Shows the BOB logo on the teal canvas for a short beat,
-/// then routes to onboarding, or straight to Home when a user is already
-/// signed in on the mock.
+/// The opening screen. Fades the BOB logo in and out on the teal canvas for a
+/// short beat on app startup (before login/signup), then routes to onboarding,
+/// or straight to Home when a user is already signed in on the mock.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -19,13 +17,47 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
-  Timer? _timer;
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 1500), _goNext);
+    // A single controller drives the whole fade in -> hold -> fade out beat.
+    // The TweenSequence spends the first ~35% fading in, holds fully opaque in
+    // the middle, then fades back out over the final ~35%.
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    );
+
+    _opacity = TweenSequence<double>(<TweenSequenceItem<double>>[
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 0.0, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 35,
+      ),
+      TweenSequenceItem<double>(
+        tween: ConstantTween<double>(1.0),
+        weight: 30,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 35,
+      ),
+    ]).animate(_controller);
+
+    // Route once the fade in/out cycle has finished playing.
+    _controller.addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.completed) {
+        _goNext();
+      }
+    });
+
+    _controller.forward();
   }
 
   void _goNext() {
@@ -41,7 +73,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -50,20 +82,23 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgBase,
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const AppLogo(size: 92),
-            const SizedBox(height: 28),
-            Text(
-              'Analisis saham, dalam bahasa manusia',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.textOnTeal2,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ],
+        child: FadeTransition(
+          opacity: _opacity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const AppLogo(size: 300),
+              const SizedBox(height: 28),
+              Text(
+                'Analisis saham, dalam bahasa manusia',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.textOnTeal2,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );
