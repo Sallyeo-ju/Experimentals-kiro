@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/format/formatters.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/animated_number.dart';
 import '../../core/widgets/favorite_button.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/signal_badge.dart';
@@ -214,12 +215,19 @@ class _PriceBlock extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            Text(
-              Formatters.rupiah(stock.price),
+            AnimatedNumber(
+              value: stock.price,
+              formatter: Formatters.rupiah,
+              upColor: AppColors.bullish,
+              downColor: AppColors.bearish,
               style: text.headlineMedium?.copyWith(
-                color: AppColors.textOnTeal,
-                fontWeight: FontWeight.w800,
-              ),
+                    color: AppColors.textOnTeal,
+                    fontWeight: FontWeight.w800,
+                  ) ??
+                  const TextStyle(
+                    color: AppColors.textOnTeal,
+                    fontWeight: FontWeight.w800,
+                  ),
             ),
             const SizedBox(width: 12),
             Padding(

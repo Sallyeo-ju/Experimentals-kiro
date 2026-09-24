@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/animated_entrance.dart';
 import '../../services/models/stock_models.dart';
 import '../../services/models/user_models.dart';
 import '../../services/providers.dart';
@@ -54,13 +55,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _openStock(String ticker) => context.push(AppRoutes.stock(ticker));
 
+  /// Pull-to-refresh: invalidate the stock providers so the visible lists
+  /// re-fetch. Re-fetching gives each list a fresh set of StockCards, which
+  /// replays their staggered entrance animation. A short delay keeps the
+  /// refresh spinner visible long enough to feel intentional on the mock.
+  Future<void> _refresh() async {
+    ref.invalidate(localStocksProvider);
+    ref.invalidate(recentlySearchedProvider);
+    ref.invalidate(favoriteStocksProvider);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgBase,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
+        child: RefreshIndicator(
+          color: AppColors.accent,
+          backgroundColor: AppColors.surface,
+          onRefresh: _refresh,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
             SliverToBoxAdapter(child: _buildHeader(context)),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -85,7 +102,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ]),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -187,10 +205,13 @@ class _FavoritesTab extends ConsumerWidget {
         return Column(
           children: <Widget>[
             for (int i = 0; i < list.length; i++) ...<Widget>[
-              StockCard(
-                stock: list[i],
-                onTap: () => onOpenStock(list[i].ticker),
-                onAskBob: () => onAskBob(list[i].ticker),
+              AnimatedEntrance(
+                index: i,
+                child: StockCard(
+                  stock: list[i],
+                  onTap: () => onOpenStock(list[i].ticker),
+                  onAskBob: () => onAskBob(list[i].ticker),
+                ),
               ),
               if (i != list.length - 1) const SizedBox(height: 10),
             ],
@@ -572,10 +593,13 @@ class _StockSection extends ConsumerWidget {
             return Column(
               children: <Widget>[
                 for (int i = 0; i < list.length; i++) ...<Widget>[
-                  StockCard(
-                    stock: list[i],
-                    onTap: () => onOpenStock(list[i].ticker),
-                    onAskBob: () => onAskBob(list[i].ticker),
+                  AnimatedEntrance(
+                    index: i,
+                    child: StockCard(
+                      stock: list[i],
+                      onTap: () => onOpenStock(list[i].ticker),
+                      onAskBob: () => onAskBob(list[i].ticker),
+                    ),
                   ),
                   if (i != list.length - 1) const SizedBox(height: 10),
                 ],

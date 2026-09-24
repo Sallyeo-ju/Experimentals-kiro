@@ -9,7 +9,10 @@ import '../theme/app_colors.dart';
 /// Favoriting is an action, not a data signal, so the active heart uses the
 /// gold accent rather than the green or red data colors. The inactive heart is
 /// an outline in a muted tone that suits whichever canvas it sits on.
-class FavoriteButton extends ConsumerWidget {
+///
+/// Tapping the heart plays a quick "scale-pop" (a small overshoot back to
+/// rest) so the toggle feels tactile.
+class FavoriteButton extends ConsumerStatefulWidget {
   const FavoriteButton({
     super.key,
     required this.ticker,
@@ -26,21 +29,62 @@ class FavoriteButton extends ConsumerWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavoriteButton> createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends ConsumerState<FavoriteButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 320),
+  );
+
+  // Pop up to 1.35x then settle back to 1.0 with a gentle overshoot.
+  late final Animation<double> _scale = TweenSequence<double>(
+    <TweenSequenceItem<double>>[
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 1.0, end: 1.35)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 1.35, end: 1.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 60,
+      ),
+    ],
+  ).animate(_controller);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTap() {
+    ref.read(favoritesProvider.notifier).toggle(widget.ticker);
+    _controller.forward(from: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final bool isFavorite = ref.watch(
-      favoritesProvider.select((s) => s.contains(ticker.toUpperCase())),
+      favoritesProvider
+          .select((s) => s.contains(widget.ticker.toUpperCase())),
     );
     final Color inactive =
-        onTeal ? AppColors.textOnTeal2 : AppColors.textSecondary;
+        widget.onTeal ? AppColors.textOnTeal2 : AppColors.textSecondary;
     return IconButton(
-      onPressed: () =>
-          ref.read(favoritesProvider.notifier).toggle(ticker),
+      onPressed: _onTap,
       visualDensity: VisualDensity.compact,
       tooltip: isFavorite ? 'Hapus dari favorit' : 'Tambah ke favorit',
-      icon: Icon(
-        isFavorite ? Icons.favorite : Icons.favorite_border,
-        color: isFavorite ? AppColors.accent : inactive,
-        size: size,
+      icon: ScaleTransition(
+        scale: _scale,
+        child: Icon(
+          isFavorite ? Icons.favorite : Icons.favorite_border,
+          color: isFavorite ? AppColors.accent : inactive,
+          size: widget.size,
+        ),
       ),
     );
   }

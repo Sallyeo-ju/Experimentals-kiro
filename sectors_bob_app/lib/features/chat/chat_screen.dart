@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/animated_entrance.dart';
 import '../../services/models/analysis_models.dart';
 import '../../services/models/stock_models.dart';
 import 'chat_controller.dart';
@@ -112,7 +113,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       itemCount: messages.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (BuildContext context, int index) {
-                        return _MessageBubble(message: messages[index]);
+                        final ChatMessage message = messages[index];
+                        // Key the entrance by message id so each bubble plays
+                        // its fade + slide once when it first appears, rather
+                        // than replaying on every list rebuild. No stagger:
+                        // messages arrive one at a time at the bottom.
+                        return AnimatedEntrance(
+                          key: ValueKey<String>('msg-${message.id}'),
+                          child: _MessageBubble(message: message),
+                        );
                       },
                     ),
             ),

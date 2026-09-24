@@ -16,6 +16,7 @@ import '../../features/search/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/stock_detail/stock_detail_screen.dart';
 import '../theme/app_colors.dart';
+import 'page_transitions.dart';
 
 /// Route path constants, kept in one place so screens can navigate by name
 /// without string typos.
@@ -94,23 +95,28 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutes.splash,
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.fadeThrough(state, const SplashScreen()),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.fadeThrough(state, const OnboardingScreen()),
       ),
       GoRoute(
         path: AppRoutes.auth,
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.fadeThrough(state, const LoginScreen()),
       ),
       GoRoute(
         path: AppRoutes.signup,
-        builder: (context, state) => const SignupScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.slideUp(state, const SignupScreen()),
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,
-        builder: (context, state) => const ForgotPasswordScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.slideUp(state, const ForgotPasswordScreen()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -122,7 +128,8 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
             routes: <RouteBase>[
               GoRoute(
                 path: AppRoutes.belajar,
-                builder: (context, state) => const BelajarScreen(),
+                pageBuilder: (context, state) =>
+                    AppPageTransitions.fadeThrough(state, const BelajarScreen()),
               ),
             ],
           ),
@@ -131,7 +138,8 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
             routes: <RouteBase>[
               GoRoute(
                 path: AppRoutes.home,
-                builder: (context, state) => const HomeScreen(),
+                pageBuilder: (context, state) =>
+                    AppPageTransitions.fadeThrough(state, const HomeScreen()),
               ),
             ],
           ),
@@ -140,7 +148,7 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
             routes: <RouteBase>[
               GoRoute(
                 path: AppRoutes.ai,
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final String? seed = state.uri.queryParameters['seed'];
                   final String? ticker = state.uri.queryParameters['ticker'];
                   // A key derived from the seed and ticker remounts the chat
@@ -148,10 +156,13 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
                   // which resets and re-seeds the conversation. Without a new
                   // seed the branch stays alive (indexedStack) and an existing
                   // conversation is preserved across tab switches on purpose.
-                  return ChatScreen(
-                    key: ValueKey<String>('ai-${seed ?? ''}-${ticker ?? ''}'),
-                    seed: seed,
-                    ticker: ticker,
+                  return AppPageTransitions.fadeThrough(
+                    state,
+                    ChatScreen(
+                      key: ValueKey<String>('ai-${seed ?? ''}-${ticker ?? ''}'),
+                      seed: seed,
+                      ticker: ticker,
+                    ),
                   );
                 },
               ),
@@ -162,32 +173,41 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.search,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const SearchScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.slideUp(state, const SearchScreen()),
       ),
       GoRoute(
         path: AppRoutes.profile,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ProfileScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.slideUp(state, const ProfileScreen()),
       ),
       GoRoute(
         path: AppRoutes.editProfile,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const EditProfileScreen(),
+        pageBuilder: (context, state) =>
+            AppPageTransitions.slideUp(state, const EditProfileScreen()),
       ),
       GoRoute(
         path: AppRoutes.articlePattern,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final String id = state.pathParameters['id'] ?? '';
-          return ArticleDetailScreen(articleId: id);
+          return AppPageTransitions.slideUp(
+            state,
+            ArticleDetailScreen(articleId: id),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.stockPattern,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final String ticker = state.pathParameters['ticker'] ?? '';
-          return StockDetailScreen(ticker: ticker.toUpperCase());
+          return AppPageTransitions.slideUp(
+            state,
+            StockDetailScreen(ticker: ticker.toUpperCase()),
+          );
         },
       ),
     ],

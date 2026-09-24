@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/animated_entrance.dart';
 import '../../services/models/stock_models.dart';
 import '../../services/providers.dart';
 import '../home/widgets/stock_card.dart';
@@ -73,9 +74,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
               itemCount: list.length,
               separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (context, i) => StockCard(
-                stock: list[i],
-                onTap: () => _openStock(list[i].ticker),
+              itemBuilder: (context, i) => AnimatedEntrance(
+                index: i,
+                child: StockCard(
+                  stock: list[i],
+                  onTap: () => _openStock(list[i].ticker),
+                ),
               ),
             );
           },
