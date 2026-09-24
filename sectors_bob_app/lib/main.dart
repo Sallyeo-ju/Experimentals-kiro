@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/theme_switch_fade.dart';
 import 'features/profile/settings_providers.dart';
 
 void main() {
@@ -27,6 +28,10 @@ class BobApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       scrollBehavior: const _NoScrollbarBehavior(),
+      // Cross-fade the whole app when the theme flips (see ThemeSwitchFade).
+      builder: (BuildContext context, Widget? child) {
+        return ThemeSwitchFade(child: child ?? const SizedBox.shrink());
+      },
       routerConfig: router,
     );
   }

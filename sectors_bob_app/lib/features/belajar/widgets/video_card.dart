@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/bob_colors.dart';
 import '../../../services/models/learn_models.dart';
+import 'bookmark_button.dart';
 
 /// Opens a learning video. Real videos launch YouTube in an external app; mock
 /// placeholders show a short note instead of a dead link. Shared by the big
@@ -210,6 +211,9 @@ class VideoRow extends StatelessWidget {
                             ),
                           ),
                         ],
+                        const Spacer(),
+                        // Save toggle for videos, keyed by the YouTube id.
+                        BookmarkButton(id: video.youtubeId),
                       ],
                     ),
                     const SizedBox(height: 4),

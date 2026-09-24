@@ -8,6 +8,7 @@ import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import '../../services/providers.dart';
+import 'learn_favorites_controller.dart';
 import 'widgets/article_card.dart';
 import 'widgets/video_card.dart';
 
@@ -29,8 +30,8 @@ final FutureProvider<List<LearnChannel>> learnChannelsProvider =
   return ref.watch(learnServiceProvider).channels();
 });
 
-/// Which content the feed shows.
-enum _Filter { semua, video, berita }
+/// Which content the feed shows. [favorit] scopes to saved items only.
+enum _Filter { semua, video, berita, favorit }
 
 /// The Belajar (Learn) tab. Replaces the old News tab.
 ///
@@ -107,7 +108,8 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
               ),
             ),
             _buildChannels(),
-            if (_filter != _Filter.berita) _buildFeatured(videos),
+            if (_filter == _Filter.semua || _filter == _Filter.video)
+              _buildFeatured(videos),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
@@ -245,12 +247,18 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
       );
     }
 
+    final Set<String> saved = ref.watch(learnFavoritesProvider);
     final List<_FeedItem> items = _composeFeed(
       videos.value ?? const <LearnVideo>[],
       articles.value ?? const <LearnArticle>[],
+      saved,
     );
 
     if (items.isEmpty) {
+      // The Favorit tab gets a friendlier, dedicated empty state.
+      if (_filter == _Filter.favorit) {
+        return const SliverToBoxAdapter(child: _SavedEmpty());
+      }
       return SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
@@ -292,10 +300,12 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
     );
   }
 
-  /// Builds the interleaved feed honoring the active filter, channel, and query.
+  /// Builds the interleaved feed honoring the active filter, channel, query, and
+  /// (for the Favorit filter) the set of [saved] item ids.
   List<_FeedItem> _composeFeed(
     List<LearnVideo> videos,
     List<LearnArticle> articles,
+    Set<String> saved,
   ) {
     final List<LearnVideo> vids = videos
         .where((LearnVideo v) =>
@@ -308,27 +318,79 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
             _matchesQuery('${a.title} ${a.source}'))
         .toList();
 
+    List<_FeedItem> interleave() {
+      // Interleave articles and videos so both are visible without one block
+      // dominating. Articles lead since they read as "latest news".
+      final List<_FeedItem> out = <_FeedItem>[];
+      final int max = arts.length > vids.length ? arts.length : vids.length;
+      for (int i = 0; i < max; i++) {
+        if (i < arts.length) {
+          out.add(_FeedItem.ofArticle(arts[i]));
+        }
+        if (i < vids.length) {
+          out.add(_FeedItem.ofVideo(vids[i]));
+        }
+      }
+      return out;
+    }
+
     switch (_filter) {
       case _Filter.video:
         return vids.map(_FeedItem.ofVideo).toList();
       case _Filter.berita:
         return arts.map(_FeedItem.ofArticle).toList();
       case _Filter.semua:
-        // Interleave articles and videos so both are visible without one block
-        // dominating. Articles lead since they read as "latest news".
-        final List<_FeedItem> out = <_FeedItem>[];
-        final int max =
-            arts.length > vids.length ? arts.length : vids.length;
-        for (int i = 0; i < max; i++) {
-          if (i < arts.length) {
-            out.add(_FeedItem.ofArticle(arts[i]));
-          }
-          if (i < vids.length) {
-            out.add(_FeedItem.ofVideo(vids[i]));
-          }
-        }
-        return out;
+        return interleave();
+      case _Filter.favorit:
+        // Only saved items, keeping the interleaved order.
+        return interleave()
+            .where((_FeedItem item) => saved.contains(
+                  item.article?.id ?? item.video?.youtubeId ?? '',
+                ))
+            .toList();
     }
+  }
+}
+
+/// Friendly empty state for the Favorit filter when nothing is saved yet.
+class _SavedEmpty extends StatelessWidget {
+  const _SavedEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+        decoration: BoxDecoration(
+          color: context.c.bgElevated,
+          borderRadius: BorderRadius.circular(AppColors.radiusCard),
+          border: Border.all(color: context.c.bgSunken),
+        ),
+        child: Column(
+          children: <Widget>[
+            Icon(Icons.bookmark_border, color: context.c.accent, size: 36),
+            const SizedBox(height: 12),
+            Text(
+              'Belum ada yang disimpan',
+              style: text.titleMedium?.copyWith(
+                color: context.c.textOnCanvas,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Ketuk ikon bookmark pada video atau berita untuk menyimpannya '
+              'di sini.',
+              textAlign: TextAlign.center,
+              style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -473,6 +535,7 @@ class _FilterChips extends StatelessWidget {
     (_Filter.semua, 'Semua'),
     (_Filter.video, 'Video'),
     (_Filter.berita, 'Berita'),
+    (_Filter.favorit, 'Favorit'),
   ];
 
   @override
