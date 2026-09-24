@@ -27,27 +27,29 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void initState() {
     super.initState();
     // A single controller drives the whole fade in -> hold -> fade out beat.
-    // The TweenSequence spends the first ~35% fading in, holds fully opaque in
-    // the middle, then fades back out over the final ~35%.
+    // The fade-in and fade-out were lengthened by 150% (each ~840ms -> 2100ms)
+    // for a slower, more cinematic reveal; the hold in the middle is unchanged.
+    // Weights below are in milliseconds so the ratios stay exact:
+    //   fade in 2100 + hold 720 + fade out 2100 = 4920ms total.
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2400),
+      duration: const Duration(milliseconds: 4920),
     );
 
     _opacity = TweenSequence<double>(<TweenSequenceItem<double>>[
       TweenSequenceItem<double>(
         tween: Tween<double>(begin: 0.0, end: 1.0)
             .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 35,
+        weight: 2100,
       ),
       TweenSequenceItem<double>(
         tween: ConstantTween<double>(1.0),
-        weight: 30,
+        weight: 720,
       ),
       TweenSequenceItem<double>(
         tween: Tween<double>(begin: 1.0, end: 0.0)
             .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 35,
+        weight: 2100,
       ),
     ]).animate(_controller);
 
@@ -90,16 +92,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 // A faint gold glow sits behind the mark so the hero moment
-                // feels warm rather than floating on flat teal.
-                const SizedBox(
-                  height: 200,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      GlowBlob(size: 300),
-                      AppLogo(size: 180),
-                    ],
-                  ),
+                // feels warm rather than floating on flat teal. The Stack sizes
+                // itself to its children (no fixed height) so the logo is never
+                // clipped, and the logo's own wordmark is hidden here because
+                // the splash shows its own tagline just below.
+                const Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    GlowBlob(size: 300),
+                    AppLogo(size: 180, showWordmark: false),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Text(
