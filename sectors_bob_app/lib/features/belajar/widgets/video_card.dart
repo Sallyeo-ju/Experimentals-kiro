@@ -54,7 +54,7 @@ class VideoCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
             border: Border.all(color: AppColors.surfaceLine),
-            boxShadow: AppColors.cardShadow,
+            boxShadow: AppColors.cardShadowRich,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
