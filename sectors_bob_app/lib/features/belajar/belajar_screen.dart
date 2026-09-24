@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import '../../services/providers.dart';
 import 'widgets/article_card.dart';
@@ -70,13 +71,14 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
         ref.watch(learnArticlesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      backgroundColor: Colors.transparent,
+      body: TealBackground(
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -116,7 +118,8 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
             ),
             _buildFeed(videos, articles),
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
-          ],
+            ],
+          ),
         ),
       ),
     );

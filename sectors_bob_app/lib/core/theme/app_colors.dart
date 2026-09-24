@@ -79,6 +79,7 @@ class AppColors {
   // Radii.
   static const double radiusCard = 18.0;
   static const double radiusSmall = 12.0;
+  static const double radiusLarge = 24.0;
 
   /// Fully rounded pill shape used by primary buttons.
   static const double radiusPill = 999.0;
@@ -93,4 +94,57 @@ class AppColors {
       offset: Offset(0, 6),
     ),
   ];
+
+  /// A richer, layered card shadow: a tight contact shadow plus a soft, wider
+  /// ambient shadow. Two layers read as real depth rather than a flat drop,
+  /// which is a big part of moving the cards from "bland" to "premium".
+  static const List<BoxShadow> cardShadowRich = <BoxShadow>[
+    BoxShadow(
+      color: Color(0x14000000),
+      blurRadius: 3,
+      offset: Offset(0, 1),
+    ),
+    BoxShadow(
+      color: Color(0x1F000000),
+      blurRadius: 24,
+      offset: Offset(0, 10),
+    ),
+  ];
+
+  /// A faint warm highlight painted along a card's top edge (a hairline of the
+  /// off-white pushed lighter) so cards catch a little "light from above".
+  static const Color surfaceHighlight = Color(0xFFFBF9F3);
+}
+
+/// A consistent spacing scale, in logical pixels, on a 4px base.
+///
+/// Using named steps instead of scattered magic numbers keeps vertical rhythm
+/// even across screens and makes "breathing room" a deliberate choice. Prefer
+/// these over raw values in new and refactored layouts.
+class AppSpacing {
+  const AppSpacing._();
+
+  /// 4 - hairline gaps, icon-to-text.
+  static const double xxs = 4.0;
+
+  /// 8 - tight gaps inside a control.
+  static const double xs = 8.0;
+
+  /// 12 - default gap between related rows.
+  static const double sm = 12.0;
+
+  /// 16 - standard content padding and gaps between cards.
+  static const double md = 16.0;
+
+  /// 20 - comfortable screen side padding.
+  static const double lg = 20.0;
+
+  /// 24 - generous padding inside hero cards, gaps between sections.
+  static const double xl = 24.0;
+
+  /// 32 - large section breaks and bottom scroll padding.
+  static const double xxl = 32.0;
+
+  /// 40 - hero spacing, empty-state vertical padding.
+  static const double xxxl = 40.0;
 }

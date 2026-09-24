@@ -6,7 +6,7 @@ import '../theme/app_colors.dart';
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
-    this.size = 72,
+    this.size = 44,
     this.showSubtitle = true,
     this.showWordmark = true,
     this.onTeal = true,
@@ -39,6 +39,7 @@ class AppLogo extends StatelessWidget {
       assetPath,
       height: size,
       fit: BoxFit.contain,
+      filterQuality: FilterQuality.high,
       errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
         return Icon(
           Icons.interests_rounded,
@@ -57,12 +58,15 @@ class AppLogo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         logoImage,
-        SizedBox(height: size * 0.10),
+        // The logo asset is tightly cropped (no baked-in transparent padding),
+        // so the subtitle needs a real, deliberate gap under the mark rather
+        // than relying on empty pixels inside the image.
+        SizedBox(height: (size * 0.14).clamp(8.0, 22.0)),
         Text(
           'Analis saham AI',
           style: TextStyle(
             color: subColor,
-            fontSize: (size * 0.18).clamp(12.0, 16.0),
+            fontSize: (size * 0.14).clamp(12.0, 18.0),
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
             height: 1,

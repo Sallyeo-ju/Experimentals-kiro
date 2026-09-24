@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/format/formatters.dart';
+// AppColors and AppSpacing both live in app_colors.dart.
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_number.dart';
 import '../../../core/widgets/favorite_button.dart';
 import '../../../core/widgets/signal_badge.dart';
 import '../../../services/models/stock_models.dart';
@@ -27,17 +29,26 @@ class StockCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     return Material(
-      color: AppColors.surface,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(AppColors.radiusCard),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
+            // A gentle top-to-bottom sheen: a lighter off-white at the top edge
+            // easing into the base surface gives the card a subtle sense of
+            // light from above instead of a flat fill.
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+              stops: <double>[0.0, 0.6],
+            ),
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
             border: Border.all(color: AppColors.surfaceLine),
-            boxShadow: AppColors.cardShadow,
+            boxShadow: AppColors.cardShadowRich,
           ),
           child: Row(
             children: <Widget>[
@@ -69,11 +80,15 @@ class StockCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  Text(
-                    Formatters.rupiah(stock.price),
+                  AnimatedNumber(
+                    value: stock.price,
+                    formatter: Formatters.rupiah,
+                    upColor: AppColors.bullish,
+                    downColor: AppColors.bearish,
                     style: text.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                          fontWeight: FontWeight.w700,
+                        ) ??
+                        const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
                   SignalBadge.change(

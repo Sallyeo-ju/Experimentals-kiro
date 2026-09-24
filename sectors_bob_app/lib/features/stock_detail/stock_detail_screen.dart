@@ -7,6 +7,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/animated_number.dart';
 import '../../core/widgets/favorite_button.dart';
+import '../../core/widgets/teal_background.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/signal_badge.dart';
 import '../../services/models/analysis_models.dart';
@@ -39,24 +40,26 @@ class StockDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<StockDetail> detail =
         ref.watch(stockDetailProvider(ticker));
-    return Scaffold(
-      backgroundColor: AppColors.bgBase,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgBase,
-        foregroundColor: AppColors.textOnTeal,
-        elevation: 0,
-        title: Text(ticker),
-        actions: <Widget>[
-          FavoriteButton(ticker: ticker, onTeal: true),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: detail.when(
-        data: (StockDetail data) => _DetailBody(detail: data),
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.accent),
+    return TealBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.textOnTeal,
+          elevation: 0,
+          title: Text(ticker),
+          actions: <Widget>[
+            FavoriteButton(ticker: ticker, onTeal: true),
+            const SizedBox(width: 4),
+          ],
         ),
-        error: (Object err, StackTrace stack) => _ErrorState(ticker: ticker),
+        body: detail.when(
+          data: (StockDetail data) => _DetailBody(detail: data),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.accent),
+          ),
+          error: (Object err, StackTrace stack) => _ErrorState(ticker: ticker),
+        ),
       ),
     );
   }
@@ -309,12 +312,17 @@ class _ChartCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+          stops: <double>[0.0, 0.6],
+        ),
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
         border: Border.all(color: AppColors.surfaceLine),
-        boxShadow: AppColors.cardShadow,
+        boxShadow: AppColors.cardShadowRich,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,12 +361,17 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+          stops: <double>[0.0, 0.6],
+        ),
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
         border: Border.all(color: AppColors.surfaceLine),
-        boxShadow: AppColors.cardShadow,
+        boxShadow: AppColors.cardShadowRich,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -370,7 +383,7 @@ class _Section extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           child,
         ],
       ),
