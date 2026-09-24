@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sectors_bob_app/core/theme/app_theme.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/bob_colors.dart';
@@ -103,7 +104,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     AppLogo(size: 180, showWordmark: false),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: 24.0),
                 Text(
                   'Analisis saham, dalam bahasa manusia',
                   textAlign: TextAlign.center,
