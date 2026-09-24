@@ -16,6 +16,7 @@ import '../../features/search/search_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/stock_detail/stock_detail_screen.dart';
 import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
 import 'page_transitions.dart';
 
 /// Route path constants, kept in one place so screens can navigate by name
@@ -286,9 +287,9 @@ class _SlimNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.navSurface,
-        border: Border(top: BorderSide(color: AppColors.navBorder)),
+      decoration: BoxDecoration(
+        color: context.c.navSurface,
+        border: Border(top: BorderSide(color: context.c.navBorder)),
       ),
       child: SafeArea(
         top: false,
@@ -327,11 +328,11 @@ class _SlimNavTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color =
-        selected ? AppColors.accent : AppColors.textOnTeal2;
+        selected ? context.c.accent : context.c.textOnCanvas2;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppColors.radiusPill),
-      splashColor: AppColors.accentTint,
+      splashColor: context.c.accentTint,
       highlightColor: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -340,7 +341,7 @@ class _SlimNavTab extends StatelessWidget {
           curve: Curves.easeOut,
           margin: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: selected ? AppColors.accentTint : Colors.transparent,
+            color: selected ? context.c.accentTint : Colors.transparent,
             borderRadius: BorderRadius.circular(AppColors.radiusPill),
           ),
           child: Column(

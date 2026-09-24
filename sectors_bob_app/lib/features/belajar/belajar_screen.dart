@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import '../../services/providers.dart';
@@ -85,7 +86,7 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
                     Text(
                       'Belajar',
                       style: text.headlineSmall?.copyWith(
-                        color: AppColors.textOnTeal,
+                        color: context.c.textOnCanvas,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -93,7 +94,7 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
                     Text(
                       'Video edukasi dan berita pasar untuk investor.',
                       style: text.bodyMedium
-                          ?.copyWith(color: AppColors.textOnTeal2),
+                          ?.copyWith(color: context.c.textOnCanvas2),
                     ),
                     const SizedBox(height: 16),
                     _SearchField(
@@ -218,11 +219,11 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
   ) {
     // Both sources must be ready to compose the mixed feed.
     if (videos.isLoading || articles.isLoading) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 40),
           child: Center(
-            child: CircularProgressIndicator(color: AppColors.accent),
+            child: CircularProgressIndicator(color: context.c.accent),
           ),
         ),
       );
@@ -237,7 +238,7 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(color: AppColors.bearish),
+                  ?.copyWith(color: context.c.bearish),
             ),
           ),
         ),
@@ -259,7 +260,7 @@ class _BelajarScreenState extends ConsumerState<BelajarScreen> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(color: AppColors.textOnTeal2),
+                  ?.copyWith(color: context.c.textOnCanvas2),
             ),
           ),
         ),
@@ -352,7 +353,7 @@ class _SectionHeader extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.textOnTeal,
+            color: context.c.textOnCanvas,
             fontWeight: FontWeight.w800,
           ),
     );
@@ -370,20 +371,20 @@ class _SearchField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+          Icon(Icons.search, color: context.c.textSecondary, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: controller,
               onChanged: onChanged,
               textInputAction: TextInputAction.search,
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(color: context.c.textPrimary),
               decoration: const InputDecoration(
                 hintText: 'Cari video atau berita',
                 border: InputBorder.none,
@@ -425,10 +426,10 @@ class _ChannelChip extends StatelessWidget {
               width: 56,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: active ? AppColors.accent : AppColors.surface,
+                color: active ? context.c.accent : context.c.surface,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: active ? AppColors.accent : AppColors.surfaceLine,
+                  color: active ? context.c.accent : context.c.surfaceLine,
                   width: 2,
                 ),
               ),
@@ -436,8 +437,8 @@ class _ChannelChip extends StatelessWidget {
                 channel.initials,
                 style: TextStyle(
                   color: active
-                      ? AppColors.textOnAccent
-                      : AppColors.textPrimary,
+                      ? context.c.textOnAccent
+                      : context.c.textPrimary,
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
                 ),
@@ -450,7 +451,7 @@ class _ChannelChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textOnTeal2,
+                    color: context.c.textOnCanvas2,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),
@@ -485,17 +486,17 @@ class _FilterChips extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: selected ? AppColors.accent : Colors.transparent,
+              color: selected ? context.c.accent : Colors.transparent,
               borderRadius: BorderRadius.circular(AppColors.radiusPill),
               border: Border.all(
-                color: selected ? AppColors.accent : AppColors.textOnTeal2,
+                color: selected ? context.c.accent : context.c.textOnCanvas2,
               ),
             ),
             child: Text(
               o.$2,
               style: TextStyle(
                 color:
-                    selected ? AppColors.textOnAccent : AppColors.textOnTeal2,
+                    selected ? context.c.textOnAccent : context.c.textOnCanvas2,
                 fontWeight: FontWeight.w700,
                 fontSize: 13,
               ),

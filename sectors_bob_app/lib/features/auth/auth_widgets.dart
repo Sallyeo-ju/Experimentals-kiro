@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 
 /// Field validators shared by the login and sign up forms.
 class AuthValidators {
@@ -59,9 +60,9 @@ class GoogleButton extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.surfaceLine),
-          backgroundColor: AppColors.surface,
+          foregroundColor: context.c.textPrimary,
+          side: BorderSide(color: context.c.surfaceLine),
+          backgroundColor: context.c.surface,
         ),
         icon: const Icon(Icons.g_mobiledata, size: 28),
         label: const Text('Masuk dengan Google'),
@@ -82,18 +83,18 @@ class AuthErrorBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.bearishSoft,
+        color: context.c.bearishSoft,
         borderRadius: BorderRadius.circular(AppColors.radiusSmall),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(Icons.error_outline, color: AppColors.bearish, size: 18),
+          Icon(Icons.error_outline, color: context.c.bearish, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: AppColors.bearish,
+              style: TextStyle(
+                color: context.c.bearish,
                 fontWeight: FontWeight.w600,
               ),
             ),

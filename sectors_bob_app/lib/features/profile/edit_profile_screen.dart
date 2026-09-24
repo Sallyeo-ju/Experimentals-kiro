@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/user_models.dart';
@@ -76,7 +77,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
         elevation: 0,
         title: const Text('Edit profil'),
       ),
@@ -87,9 +88,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           child: Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.c.surface,
               borderRadius: BorderRadius.circular(AppColors.radiusCard),
-              border: Border.all(color: AppColors.surfaceLine),
+              border: Border.all(color: context.c.surfaceLine),
               boxShadow: AppColors.cardShadow,
             ),
             child: Form(
@@ -125,7 +126,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   Text(
                     'Email tidak dapat diubah pada versi ini.',
                     style: text.bodySmall
-                        ?.copyWith(color: AppColors.textSecondary),
+                        ?.copyWith(color: context.c.textSecondary),
                   ),
                   const SizedBox(height: 20),
                   PrimaryButton(

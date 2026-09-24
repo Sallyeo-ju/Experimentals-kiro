@@ -2,19 +2,19 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
 
-/// The immersive teal canvas used behind content on BOB's dark screens.
+/// The immersive app canvas behind content on every BOB screen.
 ///
-/// Instead of a flat [AppColors.bgBase] fill, this paints:
-///  1. A soft vertical gradient (a lighter deep-teal at the top easing into the
-///     sunken teal at the bottom) so the canvas has depth and a light source.
-///  2. A fine film-grain noise layer plus a very subtle dot weave, both at low
-///     opacity, so the teal has texture up close and never reads as a flat,
-///     "jarring" slab of color, without ever competing with content.
+/// It is mode-aware: in dark mode it paints the teal gradient + texture; in
+/// light mode it paints the warm off-white gradient + a faint grain. Either
+/// way the background is never a flat slab of color. It reads its colors from
+/// the active [BobColors] via `context.c`, so it flips automatically with the
+/// theme.
 ///
-/// Wrap a screen's body in this and set the [Scaffold.backgroundColor] to
-/// transparent. Content is passed as [child] and painted on top.
+/// The name is kept as `TealBackground` for continuity across the app, but it
+/// now serves both modes. Wrap a screen's body (or the whole Scaffold) in this
+/// and set the [Scaffold.backgroundColor] to transparent.
 ///
 /// [seed] fixes the random grain so it is stable across rebuilds (no shimmer).
 class TealBackground extends StatelessWidget {
@@ -27,42 +27,53 @@ class TealBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final BobColors c = context.c;
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: <Color>[
-            AppColors.bgElevated,
-            AppColors.bgBase,
-            AppColors.bgSunken,
-          ],
-          stops: <double>[0.0, 0.55, 1.0],
+          colors: c.canvasGradient,
+          stops: const <double>[0.0, 0.55, 1.0],
         ),
       ),
       child: CustomPaint(
-        painter: _TealTexturePainter(seed: seed),
+        painter: _CanvasTexturePainter(
+          seed: seed,
+          grainLight: c.grainLight,
+          grainDark: c.grainDark,
+          dot: c.dot,
+        ),
         child: child,
       ),
     );
   }
 }
 
-/// Paints two stacked textures on the teal canvas:
+/// Paints two stacked textures on the app canvas:
 ///  - a fine, deterministic grain (tiny light and dark specks) for a filmic
 ///    noise feel, and
 ///  - a faint evenly spaced dot weave for a subtle structured pattern.
 ///
-/// Both are very low alpha and purely cosmetic (never hit-tested).
-class _TealTexturePainter extends CustomPainter {
-  _TealTexturePainter({required this.seed});
+/// All colors are passed in from the active theme so the same texture works in
+/// both modes. Both layers are very low alpha and purely cosmetic (never
+/// hit-tested).
+class _CanvasTexturePainter extends CustomPainter {
+  _CanvasTexturePainter({
+    required this.seed,
+    required this.grainLight,
+    required this.grainDark,
+    required this.dot,
+  });
 
   final int seed;
+  final Color grainLight;
+  final Color grainDark;
+  final Color dot;
 
   // Dot weave.
   static const double _spacing = 26.0;
   static const double _dotRadius = 1.1;
-  final Paint _dot = Paint()..color = const Color(0x0FFFFFFF); // ~6% white
 
   // Grain: how many specks per 100x100 area, and their max size.
   static const double _grainDensity = 0.9;
@@ -81,8 +92,8 @@ class _TealTexturePainter extends CustomPainter {
     final int count =
         ((size.width * size.height) / (100 * 100) * 100 * _grainDensity)
             .round();
-    final Paint light = Paint()..color = const Color(0x0AFFFFFF); // ~4% white
-    final Paint dark = Paint()..color = const Color(0x0A000000); // ~4% black
+    final Paint light = Paint()..color = grainLight;
+    final Paint dark = Paint()..color = grainDark;
     for (int i = 0; i < count; i++) {
       final double x = rng.nextDouble() * size.width;
       final double y = rng.nextDouble() * size.height;
@@ -95,25 +106,29 @@ class _TealTexturePainter extends CustomPainter {
   }
 
   void _paintDots(Canvas canvas, Size size) {
+    final Paint dotPaint = Paint()..color = dot;
     // Offset every other row by half a cell for a subtle diagonal weave.
     int row = 0;
     for (double y = _spacing / 2; y < size.height; y += _spacing) {
       final double xOffset = row.isEven ? 0 : _spacing / 2;
       for (double x = _spacing / 2 + xOffset; x < size.width; x += _spacing) {
-        canvas.drawCircle(Offset(x, y), _dotRadius, _dot);
+        canvas.drawCircle(Offset(x, y), _dotRadius, dotPaint);
       }
       row++;
     }
   }
 
   @override
-  bool shouldRepaint(covariant _TealTexturePainter oldDelegate) =>
-      oldDelegate.seed != seed;
+  bool shouldRepaint(covariant _CanvasTexturePainter oldDelegate) =>
+      oldDelegate.seed != seed ||
+      oldDelegate.grainLight != grainLight ||
+      oldDelegate.grainDark != grainDark ||
+      oldDelegate.dot != dot;
 }
 
 /// A decorative soft radial "glow" blob, used sparingly behind hero content
-/// (for example the splash logo) to add warmth to the teal canvas. Not
-/// interactive. [color] defaults to a faint gold wash.
+/// (for example the splash logo) to add warmth to the canvas. Not interactive.
+/// [color] defaults to a faint gold wash.
 class GlowBlob extends StatelessWidget {
   const GlowBlob({
     super.key,

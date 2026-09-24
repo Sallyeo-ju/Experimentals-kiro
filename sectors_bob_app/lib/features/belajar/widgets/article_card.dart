@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/bob_colors.dart';
 import '../../../services/models/learn_models.dart';
 
 /// A compact market-news row for the mixed Belajar feed: a small image on the
@@ -16,7 +17,7 @@ class ArticleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     return Material(
-      color: AppColors.surface,
+      color: context.c.surface,
       borderRadius: BorderRadius.circular(AppColors.radiusCard),
       child: InkWell(
         onTap: onTap,
@@ -25,7 +26,7 @@ class ArticleCard extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
-            border: Border.all(color: AppColors.surfaceLine),
+            border: Border.all(color: context.c.surfaceLine),
             boxShadow: AppColors.cardShadow,
           ),
           child: Row(
@@ -33,15 +34,15 @@ class ArticleCard extends StatelessWidget {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppColors.radiusSmall),
-                child: const SizedBox(
+                child: SizedBox(
                   width: 96,
                   height: 96,
                   child: ColoredBox(
-                    color: AppColors.surfaceAlt,
+                    color: context.c.surfaceAlt,
                     child: Center(
                       child: Icon(
                         Icons.newspaper,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                         size: 28,
                       ),
                     ),
@@ -58,18 +59,18 @@ class ArticleCard extends StatelessWidget {
                         Text(
                           article.source,
                           style: text.bodySmall?.copyWith(
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.circle,
-                            size: 3, color: AppColors.textSecondary),
+                        Icon(Icons.circle,
+                            size: 3, color: context.c.textSecondary),
                         const SizedBox(width: 6),
                         Text(
                           article.timeAgo,
                           style: text.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ],
@@ -80,7 +81,7 @@ class ArticleCard extends StatelessWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                         fontWeight: FontWeight.w700,
                         height: 1.3,
                       ),
@@ -88,16 +89,16 @@ class ArticleCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: <Widget>[
-                        const Icon(
+                        Icon(
                           Icons.schedule,
                           size: 13,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           article.readTime,
                           style: text.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

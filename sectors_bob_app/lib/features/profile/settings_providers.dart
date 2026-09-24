@@ -7,11 +7,9 @@ enum AppLanguage { indonesia, english }
 
 /// Holds the user's preferred theme mode as reactive state.
 ///
-/// This is deliberately a real, toggleable piece of state so the switch in
-/// settings moves and the icon reflects it. Dark is the first-class mode; the
-/// app is built dark-first, so flipping to light does not repaint the app yet.
-/// Settings surfaces an honest "coming soon" note next to the light option.
-/// When a light theme is built, [BobApp] can read this to pick the ThemeData.
+/// State is "isDark": dark is the default (BOB is teal-first). [BobApp] watches
+/// this to pick between [AppTheme.dark] and [AppTheme.light] via `themeMode`,
+/// so flipping the switch in settings re-themes the whole app instantly.
 class ThemeModeController extends Notifier<bool> {
   /// State is "isDark". Starts dark, matching the teal-first design.
   @override

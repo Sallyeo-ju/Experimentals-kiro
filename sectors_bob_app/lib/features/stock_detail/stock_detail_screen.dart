@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/format/formatters.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/animated_number.dart';
 import '../../core/widgets/favorite_button.dart';
 import '../../core/widgets/teal_background.dart';
@@ -45,7 +46,7 @@ class StockDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          foregroundColor: AppColors.textOnTeal,
+          foregroundColor: context.c.textOnCanvas,
           elevation: 0,
           title: Text(ticker),
           actions: <Widget>[
@@ -55,8 +56,8 @@ class StockDetailScreen extends ConsumerWidget {
         ),
         body: detail.when(
           data: (StockDetail data) => _DetailBody(detail: data),
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.accent),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: context.c.accent),
           ),
           error: (Object err, StackTrace stack) => _ErrorState(ticker: ticker),
         ),
@@ -79,9 +80,9 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(
+            Icon(
               Icons.error_outline,
-              color: AppColors.bearish,
+              color: context.c.bearish,
               size: 40,
             ),
             const SizedBox(height: 12),
@@ -89,7 +90,7 @@ class _ErrorState extends StatelessWidget {
               'Saham $ticker tidak ditemukan',
               textAlign: TextAlign.center,
               style: text.titleMedium?.copyWith(
-                color: AppColors.textOnTeal,
+                color: context.c.textOnCanvas,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -97,7 +98,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               'Coba pilih saham lain dari beranda.',
               textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+              style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
             ),
           ],
         ),
@@ -205,14 +206,14 @@ class _PriceBlock extends StatelessWidget {
         Text(
           stock.name,
           style: text.headlineSmall?.copyWith(
-            color: AppColors.textOnTeal,
+            color: context.c.textOnCanvas,
             fontWeight: FontWeight.w800,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           '${stock.ticker} . ${stock.sector}',
-          style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+          style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
         ),
         const SizedBox(height: 14),
         Row(
@@ -221,14 +222,14 @@ class _PriceBlock extends StatelessWidget {
             AnimatedNumber(
               value: stock.price,
               formatter: Formatters.rupiah,
-              upColor: AppColors.bullish,
-              downColor: AppColors.bearish,
+              upColor: context.c.bullish,
+              downColor: context.c.bearish,
               style: text.headlineMedium?.copyWith(
-                    color: AppColors.textOnTeal,
+                    color: context.c.textOnCanvas,
                     fontWeight: FontWeight.w800,
                   ) ??
-                  const TextStyle(
-                    color: AppColors.textOnTeal,
+                  TextStyle(
+                    color: context.c.textOnCanvas,
                     fontWeight: FontWeight.w800,
                   ),
             ),
@@ -274,16 +275,16 @@ class _StatChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: BoxDecoration(
-          color: AppColors.bgElevated,
+          color: context.c.bgElevated,
           borderRadius: BorderRadius.circular(AppColors.radiusSmall),
-          border: Border.all(color: AppColors.bgSunken),
+          border: Border.all(color: context.c.bgSunken),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               label,
-              style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
+              style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
             ),
             const SizedBox(height: 2),
             Text(
@@ -291,7 +292,7 @@ class _StatChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: text.bodyMedium?.copyWith(
-                color: AppColors.textOnTeal,
+                color: context.c.textOnCanvas,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -314,14 +315,14 @@ class _ChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+          colors: <Color>[context.c.surfaceHighlight, context.c.surface],
           stops: <double>[0.0, 0.6],
         ),
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
         boxShadow: AppColors.cardShadowRich,
       ),
       child: Column(
@@ -330,7 +331,7 @@ class _ChartCard extends StatelessWidget {
           Text(
             'Pergerakan harga',
             style: text.titleSmall?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -340,7 +341,7 @@ class _ChartCard extends StatelessWidget {
           Text(
             detail.description,
             style: text.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               height: 1.4,
             ),
           ),
@@ -363,14 +364,14 @@ class _Section extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+          colors: <Color>[context.c.surfaceHighlight, context.c.surface],
           stops: <double>[0.0, 0.6],
         ),
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
         boxShadow: AppColors.cardShadowRich,
       ),
       child: Column(
@@ -379,7 +380,7 @@ class _Section extends StatelessWidget {
           Text(
             title,
             style: text.titleMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -419,7 +420,7 @@ class _MetricRow extends StatelessWidget {
                   name,
                   style: text.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -428,7 +429,7 @@ class _MetricRow extends StatelessWidget {
                 value,
                 style: text.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(width: 8),
@@ -439,7 +440,7 @@ class _MetricRow extends StatelessWidget {
           Text(
             interpretation,
             style: text.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               height: 1.35,
             ),
           ),
@@ -465,7 +466,7 @@ class _NewsRow extends StatelessWidget {
           Text(
             headline.title,
             style: text.bodyMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               height: 1.35,
             ),
           ),
@@ -475,7 +476,7 @@ class _NewsRow extends StatelessWidget {
               Text(
                 headline.source,
                 style: text.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -501,10 +502,10 @@ class _RelatedLinkRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: <Widget>[
-          const Icon(
+          Icon(
             Icons.link,
             size: 18,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -514,23 +515,23 @@ class _RelatedLinkRow extends StatelessWidget {
                 Text(
                   link.title,
                   style: text.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   link.source,
                   style: text.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(
+          Icon(
             Icons.chevron_right,
             size: 20,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ],
       ),

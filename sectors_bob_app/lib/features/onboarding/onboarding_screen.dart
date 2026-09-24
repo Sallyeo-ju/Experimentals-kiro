@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/ghost_button.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/teal_background.dart';
@@ -106,7 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 child: TextButton(
                   onPressed: _finish,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textOnTeal2,
+                    foregroundColor: context.c.textOnCanvas2,
                   ),
                   child: const Text('Lewati'),
                 ),
@@ -163,7 +164,7 @@ class _SlideView extends StatelessWidget {
           Text(
             slide.title,
             style: text.headlineSmall?.copyWith(
-              color: AppColors.textOnTeal,
+              color: context.c.textOnCanvas,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -171,7 +172,7 @@ class _SlideView extends StatelessWidget {
           Text(
             slide.body,
             style: text.bodyLarge?.copyWith(
-              color: AppColors.textOnTeal2,
+              color: context.c.textOnCanvas2,
               height: 1.5,
             ),
           ),
@@ -199,14 +200,14 @@ class _CheckPoint extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Icon(Icons.check_circle_rounded,
-            color: AppColors.accent, size: 18),
+        Icon(Icons.check_circle_rounded,
+            color: context.c.accent, size: 18),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
             text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textOnTeal,
+                  color: context.c.textOnCanvas,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -229,9 +230,9 @@ class _PreviewFrame extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 150),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.bgElevated,
+        color: context.c.bgElevated,
         borderRadius: BorderRadius.circular(AppColors.radiusLarge),
-        border: Border.all(color: AppColors.navBorder),
+        border: Border.all(color: context.c.navBorder),
       ),
       child: child,
     );
@@ -284,13 +285,13 @@ class _Bubble extends StatelessWidget {
           vertical: AppSpacing.xs,
         ),
         decoration: BoxDecoration(
-          color: fromUser ? AppColors.accent : AppColors.surface,
+          color: fromUser ? context.c.accent : context.c.surface,
           borderRadius: BorderRadius.circular(AppColors.radiusCard),
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: fromUser ? AppColors.textOnAccent : AppColors.textPrimary,
+            color: fromUser ? context.c.textOnAccent : context.c.textPrimary,
             fontWeight: FontWeight.w600,
             height: 1.35,
             fontSize: 13,
@@ -309,30 +310,30 @@ class _SignalsPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _PreviewFrame(
+    return _PreviewFrame(
       child: Column(
         children: <Widget>[
           _SignalRow(
             label: 'Teknikal',
             value: 'Netral',
-            tint: AppColors.surfaceAlt,
-            color: AppColors.textSecondary,
+            tint: context.c.surfaceAlt,
+            color: context.c.textSecondary,
             icon: Icons.trending_flat,
           ),
           SizedBox(height: AppSpacing.xs),
           _SignalRow(
             label: 'Fundamental',
             value: 'Kuat',
-            tint: AppColors.bullishTint,
-            color: AppColors.bullishOnSurface,
+            tint: context.c.bullishTint,
+            color: context.c.bullishOnSurface,
             icon: Icons.trending_up,
           ),
           SizedBox(height: AppSpacing.xs),
           _SignalRow(
             label: 'Berita',
             value: 'Positif',
-            tint: AppColors.bullishTint,
-            color: AppColors.bullishOnSurface,
+            tint: context.c.bullishTint,
+            color: context.c.bullishOnSurface,
             icon: Icons.trending_up,
           ),
         ],
@@ -366,7 +367,7 @@ class _SignalRow extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusSmall),
       ),
       child: Row(
@@ -374,8 +375,8 @@ class _SignalRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: context.c.textPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 13,
               ),
@@ -423,24 +424,24 @@ class _DyorPreview extends StatelessWidget {
             width: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.accentTint,
+              color: context.c.accentTint,
               borderRadius: BorderRadius.circular(AppColors.radiusSmall),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.shield_outlined,
-              color: AppColors.accent,
+              color: context.c.accent,
               size: 24,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   'Bukan nasihat keuangan',
                   style: TextStyle(
-                    color: AppColors.textOnTeal,
+                    color: context.c.textOnCanvas,
                     fontWeight: FontWeight.w800,
                     fontSize: 14,
                   ),
@@ -450,7 +451,7 @@ class _DyorPreview extends StatelessWidget {
                   'BOB kasih konteks. Do Your Own Research (DYOR) '
                   'sebelum ambil keputusan.',
                   style: TextStyle(
-                    color: AppColors.textOnTeal2,
+                    color: context.c.textOnCanvas2,
                     height: 1.35,
                     fontSize: 12,
                   ),
@@ -483,7 +484,7 @@ class _Dots extends StatelessWidget {
           height: 8,
           width: isActive ? 22 : 8,
           decoration: BoxDecoration(
-            color: isActive ? AppColors.accent : AppColors.textOnTeal2,
+            color: isActive ? context.c.accent : context.c.textOnCanvas2,
             borderRadius: BorderRadius.circular(AppColors.radiusPill),
           ),
         );

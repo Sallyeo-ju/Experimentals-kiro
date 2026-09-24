@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
 
 /// The primary call to action across BOB.
 ///
@@ -28,12 +28,13 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget child = isLoading
-        ? const SizedBox(
+        ? SizedBox(
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2.4,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.textOnAccent),
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(context.c.textOnAccent),
             ),
           )
         : Row(

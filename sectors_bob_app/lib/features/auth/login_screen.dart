@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/teal_background.dart';
@@ -71,9 +72,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.c.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusCard),
-                  border: Border.all(color: AppColors.surfaceLine),
+                  border: Border.all(color: context.c.surfaceLine),
                   boxShadow: AppColors.cardShadow,
                 ),
                 child: Form(
@@ -91,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         'Lanjutkan ke analisis saham kamu.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.c.textSecondary,
                             ),
                       ),
                       const SizedBox(height: 20),
@@ -139,7 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           onPressed: () =>
                               context.push(AppRoutes.forgotPassword),
                           style: TextButton.styleFrom(
-                            foregroundColor: AppColors.accentPress,
+                            foregroundColor: context.c.accentPress,
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -155,16 +156,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 12),
                       Row(
-                        children: const <Widget>[
-                          Expanded(child: Divider()),
+                        children: <Widget>[
+                          const Expanded(child: Divider()),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Text(
                               'atau',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: context.c.textSecondary),
                             ),
                           ),
-                          Expanded(child: Divider()),
+                          const Expanded(child: Divider()),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -182,14 +183,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Text(
+                  Text(
                     'Belum punya akun?',
-                    style: TextStyle(color: AppColors.textOnTeal2),
+                    style: TextStyle(color: context.c.textOnCanvas2),
                   ),
                   TextButton(
                     onPressed: () => context.go(AppRoutes.signup),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.accent,
+                      foregroundColor: context.c.accent,
                     ),
                     child: const Text('Daftar'),
                   ),

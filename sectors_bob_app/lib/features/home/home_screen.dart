@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/stock_models.dart';
@@ -74,8 +75,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: TealBackground(
         child: SafeArea(
           child: RefreshIndicator(
-            color: AppColors.accent,
-            backgroundColor: AppColors.surface,
+            color: context.c.accent,
+            backgroundColor: context.c.surface,
             onRefresh: _refresh,
             child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -137,13 +138,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 20),
           Text(
             'Halo, ${user?.displayName.split(' ').first ?? 'investor'}',
-            style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+            style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
           ),
           const SizedBox(height: 2),
           Text(
             'Mau tanya saham apa hari ini?',
             style: text.headlineSmall?.copyWith(
-              color: AppColors.textOnTeal,
+              color: context.c.textOnCanvas,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -221,13 +222,13 @@ class _FavoritesTab extends ConsumerWidget {
           ],
         );
       },
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      loading: () => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator(color: context.c.accent)),
       ),
       error: (Object err, StackTrace stack) => Text(
         'Gagal memuat favorit. Coba lagi nanti.',
-        style: text.bodyMedium?.copyWith(color: AppColors.bearish),
+        style: text.bodyMedium?.copyWith(color: context.c.bearish),
       ),
     );
   }
@@ -243,19 +244,19 @@ class _FavoritesEmpty extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
       decoration: BoxDecoration(
-        color: AppColors.bgElevated,
+        color: context.c.bgElevated,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.bgSunken),
+        border: Border.all(color: context.c.bgSunken),
       ),
       child: Column(
         children: <Widget>[
-          const Icon(Icons.favorite_border,
-              color: AppColors.accent, size: 36),
+          Icon(Icons.favorite_border,
+              color: context.c.accent, size: 36),
           const SizedBox(height: 12),
           Text(
             'Belum ada favorit',
             style: text.titleMedium?.copyWith(
-              color: AppColors.textOnTeal,
+              color: context.c.textOnCanvas,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -263,7 +264,7 @@ class _FavoritesEmpty extends StatelessWidget {
           Text(
             'Ketuk ikon hati pada saham untuk menyimpannya di sini.',
             textAlign: TextAlign.center,
-            style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+            style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
           ),
         ],
       ),
@@ -280,7 +281,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: context.c.surface,
       borderRadius: BorderRadius.circular(AppColors.radiusPill),
       child: InkWell(
         onTap: onTap,
@@ -289,17 +290,17 @@ class _SearchBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppColors.radiusPill),
-            border: Border.all(color: AppColors.surfaceLine),
+            border: Border.all(color: context.c.surfaceLine),
           ),
           child: Row(
             children: <Widget>[
-              const Icon(Icons.search,
-                  color: AppColors.textSecondary, size: 20),
+              Icon(Icons.search,
+                  color: context.c.textSecondary, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Cari saham',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
               ),
             ],
@@ -327,14 +328,14 @@ class _ProfileAvatar extends StatelessWidget {
         height: 46,
         width: 46,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: AppColors.accent,
+        decoration: BoxDecoration(
+          color: context.c.accent,
           shape: BoxShape.circle,
         ),
         child: Text(
           initials,
-          style: const TextStyle(
-            color: AppColors.textOnAccent,
+          style: TextStyle(
+            color: context.c.textOnAccent,
             fontWeight: FontWeight.w800,
             fontSize: 16,
           ),
@@ -374,22 +375,22 @@ class _AskBobCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.bgElevated,
+        color: context.c.bgElevated,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.bgSunken),
+        border: Border.all(color: context.c.bgSunken),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             children: <Widget>[
-              const Icon(Icons.auto_awesome,
-                  color: AppColors.accent, size: 18),
+              Icon(Icons.auto_awesome,
+                  color: context.c.accent, size: 18),
               const SizedBox(width: 8),
               Text(
                 'Tanya BOB',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.textOnTeal,
+                      color: context.c.textOnCanvas,
                       fontWeight: FontWeight.w800,
                     ),
               ),
@@ -417,9 +418,9 @@ class _AskBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 6),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
       ),
       child: Row(
         children: <Widget>[
@@ -428,7 +429,7 @@ class _AskBar extends StatelessWidget {
               controller: controller,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => onSubmit(),
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: TextStyle(color: context.c.textPrimary),
               decoration: const InputDecoration(
                 hintText: 'Tanya BOB is this bullish or bearish',
                 border: InputBorder.none,
@@ -443,16 +444,16 @@ class _AskBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Material(
-              color: AppColors.accent,
+              color: context.c.accent,
               borderRadius: BorderRadius.circular(AppColors.radiusPill),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppColors.radiusPill),
                 onTap: onSubmit,
-                child: const Padding(
-                  padding: EdgeInsets.all(9),
+                child: Padding(
+                  padding: const EdgeInsets.all(9),
                   child: Icon(
                     Icons.arrow_forward,
-                    color: AppColors.textOnAccent,
+                    color: context.c.textOnAccent,
                     size: 20,
                   ),
                 ),
@@ -484,12 +485,12 @@ class _SuggestedQuestions extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppColors.radiusPill),
-              border: Border.all(color: AppColors.accent),
+              border: Border.all(color: context.c.accent),
             ),
             child: Text(
               q,
-              style: const TextStyle(
-                color: AppColors.accent,
+              style: TextStyle(
+                color: context.c.accent,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -518,9 +519,9 @@ class _SegmentToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.bgElevated,
+        color: context.c.bgElevated,
         borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.bgSunken),
+        border: Border.all(color: context.c.bgSunken),
       ),
       child: Row(
         children: <Widget>[
@@ -533,15 +534,15 @@ class _SegmentToggle extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: index == i ? AppColors.accent : Colors.transparent,
+                    color: index == i ? context.c.accent : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppColors.radiusPill),
                   ),
                   child: Text(
                     labels[i],
                     style: TextStyle(
                       color: index == i
-                          ? AppColors.textOnAccent
-                          : AppColors.textOnTeal2,
+                          ? context.c.textOnAccent
+                          : context.c.textOnCanvas2,
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                     ),
@@ -580,7 +581,7 @@ class _StockSection extends ConsumerWidget {
         Text(
           title,
           style: text.titleMedium?.copyWith(
-            color: AppColors.textOnTeal,
+            color: context.c.textOnCanvas,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -590,7 +591,7 @@ class _StockSection extends ConsumerWidget {
             if (list.isEmpty) {
               return Text(
                 'Belum ada data.',
-                style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+                style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
               );
             }
             return Column(
@@ -609,15 +610,15 @@ class _StockSection extends ConsumerWidget {
               ],
             );
           },
-          loading: () => const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
+          loading: () => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
+              child: CircularProgressIndicator(color: context.c.accent),
             ),
           ),
           error: (Object err, StackTrace stack) => Text(
             'Gagal memuat data. Coba lagi nanti.',
-            style: text.bodyMedium?.copyWith(color: AppColors.bearish),
+            style: text.bodyMedium?.copyWith(color: context.c.bearish),
           ),
         ),
       ],

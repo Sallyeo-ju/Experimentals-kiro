@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/animated_entrance.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/analysis_models.dart';
@@ -145,9 +146,9 @@ class _ChatHeader extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: AppColors.bgBase,
-        border: Border(bottom: BorderSide(color: AppColors.bgSunken)),
+      decoration: BoxDecoration(
+        color: context.c.bgBase,
+        border: Border(bottom: BorderSide(color: context.c.bgSunken)),
       ),
       child: Row(
         children: <Widget>[
@@ -156,13 +157,13 @@ class _ChatHeader extends StatelessWidget {
             width: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: context.c.accent,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Text(
+            child: Text(
               'B',
               style: TextStyle(
-                color: AppColors.textOnAccent,
+                color: context.c.textOnAccent,
                 fontWeight: FontWeight.w900,
                 fontSize: 20,
               ),
@@ -175,7 +176,7 @@ class _ChatHeader extends StatelessWidget {
               Text(
                 'BOB AI',
                 style: text.titleMedium?.copyWith(
-                  color: AppColors.textOnTeal,
+                  color: context.c.textOnCanvas,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -184,8 +185,8 @@ class _ChatHeader extends StatelessWidget {
                   Container(
                     height: 8,
                     width: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.bullish,
+                    decoration: BoxDecoration(
+                      color: context.c.bullish,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -193,7 +194,7 @@ class _ChatHeader extends StatelessWidget {
                   Text(
                     'Online',
                     style: text.bodySmall?.copyWith(
-                      color: AppColors.textOnTeal2,
+                      color: context.c.textOnCanvas2,
                     ),
                   ),
                 ],
@@ -225,9 +226,9 @@ class _EmptyState extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Icon(
+                Icon(
                   Icons.auto_awesome_outlined,
-                  color: AppColors.accent,
+                  color: context.c.accent,
                   size: 36,
                 ),
                 const SizedBox(height: 14),
@@ -235,7 +236,7 @@ class _EmptyState extends StatelessWidget {
                   'Tanya saham apa saja',
                   textAlign: TextAlign.center,
                   style: text.titleMedium?.copyWith(
-                    color: AppColors.textOnTeal,
+                    color: context.c.textOnCanvas,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -245,7 +246,7 @@ class _EmptyState extends StatelessWidget {
                   'teknikal, fundamental, dan berita.',
                   textAlign: TextAlign.center,
                   style:
-                      text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+                      text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
                 ),
                 const SizedBox(height: 24),
                 Wrap(
@@ -264,12 +265,12 @@ class _EmptyState extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius:
                               BorderRadius.circular(AppColors.radiusPill),
-                          border: Border.all(color: AppColors.accent),
+                          border: Border.all(color: context.c.accent),
                         ),
                         child: Text(
                           q,
-                          style: const TextStyle(
-                            color: AppColors.accent,
+                          style: TextStyle(
+                            color: context.c.accent,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -306,7 +307,7 @@ class _MessageBubble extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: context.c.accent,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppColors.radiusCard),
                 topRight: Radius.circular(AppColors.radiusCard),
@@ -316,8 +317,8 @@ class _MessageBubble extends StatelessWidget {
             ),
             child: Text(
               message.text ?? '',
-              style: const TextStyle(
-                color: AppColors.textOnAccent,
+              style: TextStyle(
+                color: context.c.textOnAccent,
                 fontWeight: FontWeight.w600,
                 height: 1.35,
               ),
@@ -368,9 +369,9 @@ class _ThinkingIndicatorState extends State<_ThinkingIndicator>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -390,8 +391,8 @@ class _ThinkingIndicatorState extends State<_ThinkingIndicator>
                       child: Container(
                         height: 7,
                         width: 7,
-                        decoration: const BoxDecoration(
-                          color: AppColors.accentPress,
+                        decoration: BoxDecoration(
+                          color: context.c.accentPress,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -405,7 +406,7 @@ class _ThinkingIndicatorState extends State<_ThinkingIndicator>
           Text(
             'BOB sedang menganalisis...',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -426,16 +427,16 @@ class _ChatInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-      color: AppColors.bgBase,
+      color: context.c.bgBase,
       child: Row(
         children: <Widget>[
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.c.surface,
                 borderRadius: BorderRadius.circular(AppColors.radiusPill),
-                border: Border.all(color: AppColors.surfaceLine),
+                border: Border.all(color: context.c.surfaceLine),
               ),
               child: TextField(
                 controller: controller,
@@ -457,16 +458,16 @@ class _ChatInput extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Material(
-            color: AppColors.accent,
+            color: context.c.accent,
             shape: const CircleBorder(),
             child: InkWell(
               customBorder: const CircleBorder(),
               onTap: onSend,
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(12),
                 child: Icon(
                   Icons.send_rounded,
-                  color: AppColors.textOnAccent,
+                  color: context.c.textOnAccent,
                   size: 22,
                 ),
               ),

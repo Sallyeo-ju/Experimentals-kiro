@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/providers.dart';
@@ -108,7 +108,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   'Analisis saham, dalam bahasa manusia',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.textOnTeal2,
+                        color: context.c.textOnCanvas2,
                         fontWeight: FontWeight.w500,
                       ),
                 ),

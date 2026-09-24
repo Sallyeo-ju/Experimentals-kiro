@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/favorites/favorites_controller.dart';
-import '../theme/app_colors.dart';
+import '../theme/bob_colors.dart';
 
 /// A heart toggle that favorites or unfavorites a ticker.
 ///
@@ -72,8 +72,9 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
       favoritesProvider
           .select((s) => s.contains(widget.ticker.toUpperCase())),
     );
+    final BobColors c = context.c;
     final Color inactive =
-        widget.onTeal ? AppColors.textOnTeal2 : AppColors.textSecondary;
+        widget.onTeal ? c.textOnCanvas2 : c.textSecondary;
     return IconButton(
       onPressed: _onTap,
       visualDensity: VisualDensity.compact,
@@ -82,7 +83,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
         scale: _scale,
         child: Icon(
           isFavorite ? Icons.favorite : Icons.favorite_border,
-          color: isFavorite ? AppColors.accent : inactive,
+          color: isFavorite ? c.accent : inactive,
           size: widget.size,
         ),
       ),

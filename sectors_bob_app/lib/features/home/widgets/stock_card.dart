@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/format/formatters.dart';
 // AppColors and AppSpacing both live in app_colors.dart.
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/bob_colors.dart';
 import '../../../core/widgets/animated_number.dart';
 import '../../../core/widgets/favorite_button.dart';
 import '../../../core/widgets/signal_badge.dart';
@@ -40,14 +41,14 @@ class StockCard extends StatelessWidget {
             // A gentle top-to-bottom sheen: a lighter off-white at the top edge
             // easing into the base surface gives the card a subtle sense of
             // light from above instead of a flat fill.
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: <Color>[AppColors.surfaceHighlight, AppColors.surface],
+              colors: <Color>[context.c.surfaceHighlight, context.c.surface],
               stops: <double>[0.0, 0.6],
             ),
             borderRadius: BorderRadius.circular(AppColors.radiusCard),
-            border: Border.all(color: AppColors.surfaceLine),
+            border: Border.all(color: context.c.surfaceLine),
             boxShadow: AppColors.cardShadowRich,
           ),
           child: Row(
@@ -70,7 +71,7 @@ class StockCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: text.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ],
@@ -83,8 +84,8 @@ class StockCard extends StatelessWidget {
                   AnimatedNumber(
                     value: stock.price,
                     formatter: Formatters.rupiah,
-                    upColor: AppColors.bullish,
-                    downColor: AppColors.bearish,
+                    upColor: context.c.bullish,
+                    downColor: context.c.bearish,
                     style: text.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                         ) ??
@@ -105,9 +106,9 @@ class StockCard extends StatelessWidget {
                   onPressed: onAskBob,
                   tooltip: 'Tanya BOB soal ${stock.ticker}',
                   visualDensity: VisualDensity.compact,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.auto_awesome_outlined,
-                    color: AppColors.accentPress,
+                    color: context.c.accentPress,
                   ),
                 ),
             ],
@@ -131,13 +132,13 @@ class _TickerAvatar extends StatelessWidget {
       width: 44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: AppColors.bgBase,
+        color: context.c.bgBase,
         borderRadius: BorderRadius.circular(AppColors.radiusSmall),
       ),
       child: Text(
         ticker.length >= 2 ? ticker.substring(0, 2) : ticker,
-        style: const TextStyle(
-          color: AppColors.textOnTeal,
+        style: TextStyle(
+          color: context.c.textOnCanvas,
           fontWeight: FontWeight.w800,
           fontSize: 15,
         ),

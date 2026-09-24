@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/learn_models.dart';
 import 'belajar_screen.dart';
@@ -26,7 +27,7 @@ class ArticleDetailScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
         elevation: 0,
         actions: <Widget>[
           IconButton(
@@ -49,8 +50,8 @@ class ArticleDetailScreen extends ConsumerWidget {
           }
           return _Body(article: article);
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.accent),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: context.c.accent),
         ),
         error: (Object err, StackTrace stack) => const _NotFound(),
       ),
@@ -86,7 +87,7 @@ class _Body extends StatelessWidget {
         Text(
           article.title,
           style: text.headlineSmall?.copyWith(
-            color: AppColors.textOnTeal,
+            color: context.c.textOnCanvas,
             fontWeight: FontWeight.w800,
             height: 1.25,
           ),
@@ -97,23 +98,23 @@ class _Body extends StatelessWidget {
             Text(
               article.source,
               style: text.bodySmall?.copyWith(
-                color: AppColors.accent,
+                color: context.c.accent,
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.circle, size: 4, color: AppColors.textOnTeal2),
+            Icon(Icons.circle, size: 4, color: context.c.textOnCanvas2),
             const SizedBox(width: 8),
             Text(
               article.timeAgo,
-              style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
+              style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.circle, size: 4, color: AppColors.textOnTeal2),
+            Icon(Icons.circle, size: 4, color: context.c.textOnCanvas2),
             const SizedBox(width: 8),
             Text(
               article.readTime,
-              style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
+              style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
             ),
           ],
         ),
@@ -122,7 +123,7 @@ class _Body extends StatelessWidget {
           Text(
             paragraph,
             style: text.bodyLarge?.copyWith(
-              color: AppColors.textOnTeal,
+              color: context.c.textOnCanvas,
               height: 1.6,
             ),
           ),
@@ -132,14 +133,14 @@ class _Body extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.bgElevated,
+            color: context.c.bgElevated,
             borderRadius: BorderRadius.circular(AppColors.radiusSmall),
-            border: Border.all(color: AppColors.bgSunken),
+            border: Border.all(color: context.c.bgSunken),
           ),
           child: Text(
             'Berita ini bersifat informasi umum dan bukan rekomendasi beli '
             'atau jual. Lakukan riset mandiri sebelum berinvestasi.',
-            style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
+            style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
           ),
         ),
       ],
@@ -161,12 +162,12 @@ class _ImageHeader extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            const ColoredBox(
-              color: AppColors.bgElevated,
+            ColoredBox(
+              color: context.c.bgElevated,
               child: Center(
                 child: Icon(
                   Icons.image_outlined,
-                  color: AppColors.textOnTeal2,
+                  color: context.c.textOnCanvas2,
                   size: 40,
                 ),
               ),
@@ -186,22 +187,22 @@ class _ImageHeader extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.c.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusPill),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const Icon(
+                    Icon(
                       Icons.newspaper,
                       size: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       source,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: context.c.textPrimary,
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
                       ),
@@ -233,9 +234,9 @@ class _ActionRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.bgElevated,
+        color: context.c.bgElevated,
         borderRadius: BorderRadius.circular(AppColors.radiusPill),
-        border: Border.all(color: AppColors.bgSunken),
+        border: Border.all(color: context.c.bgSunken),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -277,13 +278,13 @@ class _ActionItem extends StatelessWidget {
     return TextButton.icon(
       onPressed: onTap,
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
       ),
-      icon: Icon(icon, size: 18, color: AppColors.textOnTeal),
+      icon: Icon(icon, size: 18, color: context.c.textOnCanvas),
       label: Text(
         label,
-        style: const TextStyle(
-          color: AppColors.textOnTeal,
+        style: TextStyle(
+          color: context.c.textOnCanvas,
           fontWeight: FontWeight.w600,
           fontSize: 13,
         ),
@@ -303,7 +304,7 @@ class _NotFound extends StatelessWidget {
         style: Theme.of(context)
             .textTheme
             .bodyMedium
-            ?.copyWith(color: AppColors.textOnTeal2),
+            ?.copyWith(color: context.c.textOnCanvas2),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/teal_background.dart';
 import '../../services/models/user_models.dart';
 import '../../services/providers.dart';
@@ -37,7 +38,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
         elevation: 0,
         title: const Text('Profil'),
       ),
@@ -55,9 +56,9 @@ class ProfileScreen extends ConsumerWidget {
                 _SettingsRow(
                   icon: Icons.person_outline,
                   label: 'Edit profil',
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                   onTap: () => context.push(AppRoutes.editProfile),
                 ),
@@ -68,7 +69,7 @@ class ProfileScreen extends ConsumerWidget {
                   trailing: Text(
                     user?.email ?? '-',
                     style: text.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ),
@@ -80,12 +81,13 @@ class ProfileScreen extends ConsumerWidget {
             _SettingsGroup(
               children: <Widget>[
                 _SettingsRow(
-                  icon: isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
-                  label: 'Mode gelap',
-                  subtitle: isDark ? null : 'Mode terang segera hadir',
+                  icon: isDark
+                      ? Icons.dark_mode_outlined
+                      : Icons.light_mode_outlined,
+                  label: isDark ? 'Mode gelap' : 'Mode terang',
                   trailing: Switch(
                     value: isDark,
-                    activeThumbColor: AppColors.accent,
+                    activeThumbColor: context.c.accent,
                     onChanged: (bool v) =>
                         ref.read(isDarkModeProvider.notifier).setDark(v),
                   ),
@@ -106,8 +108,8 @@ class ProfileScreen extends ConsumerWidget {
             OutlinedButton.icon(
               onPressed: () => _signOut(context, ref),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textOnTeal,
-                side: const BorderSide(color: AppColors.textOnTeal2),
+                foregroundColor: context.c.textOnCanvas,
+                side: BorderSide(color: context.c.textOnCanvas2),
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               icon: const Icon(Icons.logout),
@@ -117,7 +119,7 @@ class ProfileScreen extends ConsumerWidget {
             Center(
               child: Text(
                 'BOB v1.0.0  .  DYOR selalu berlaku',
-                style: text.bodySmall?.copyWith(color: AppColors.textOnTeal2),
+                style: text.bodySmall?.copyWith(color: context.c.textOnCanvas2),
               ),
             ),
           ],
@@ -144,14 +146,14 @@ class _ProfileHeader extends StatelessWidget {
           height: 64,
           width: 64,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: AppColors.accent,
+          decoration: BoxDecoration(
+            color: context.c.accent,
             shape: BoxShape.circle,
           ),
           child: Text(
             initials,
-            style: const TextStyle(
-              color: AppColors.textOnAccent,
+            style: TextStyle(
+              color: context.c.textOnAccent,
               fontWeight: FontWeight.w800,
               fontSize: 22,
             ),
@@ -165,14 +167,14 @@ class _ProfileHeader extends StatelessWidget {
               Text(
                 name,
                 style: text.titleLarge?.copyWith(
-                  color: AppColors.textOnTeal,
+                  color: context.c.textOnCanvas,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 user?.email ?? 'Belum masuk',
-                style: text.bodyMedium?.copyWith(color: AppColors.textOnTeal2),
+                style: text.bodyMedium?.copyWith(color: context.c.textOnCanvas2),
               ),
               if (user?.isGoogle ?? false) ...<Widget>[
                 const SizedBox(height: 6),
@@ -180,14 +182,14 @@ class _ProfileHeader extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.bgElevated,
+                    color: context.c.bgElevated,
                     borderRadius: BorderRadius.circular(AppColors.radiusPill),
-                    border: Border.all(color: AppColors.bgSunken),
+                    border: Border.all(color: context.c.bgSunken),
                   ),
                   child: Text(
                     'Akun Google',
                     style: text.bodySmall?.copyWith(
-                      color: AppColors.textOnTeal2,
+                      color: context.c.textOnCanvas2,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -224,7 +226,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       text.toUpperCase(),
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textOnTeal2,
+            color: context.c.textOnCanvas2,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.2,
           ),
@@ -241,9 +243,9 @@ class _SettingsGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(AppColors.radiusCard),
-        border: Border.all(color: AppColors.surfaceLine),
+        border: Border.all(color: context.c.surfaceLine),
         boxShadow: AppColors.cardShadow,
       ),
       child: Column(children: children),
@@ -276,7 +278,7 @@ class _SettingsRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: <Widget>[
-            Icon(icon, color: AppColors.textPrimary, size: 22),
+            Icon(icon, color: context.c.textPrimary, size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -285,7 +287,7 @@ class _SettingsRow extends StatelessWidget {
                   Text(
                     label,
                     style: text.bodyLarge?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -294,7 +296,7 @@ class _SettingsRow extends StatelessWidget {
                     Text(
                       subtitle!,
                       style: text.bodySmall
-                          ?.copyWith(color: AppColors.textSecondary),
+                          ?.copyWith(color: context.c.textSecondary),
                     ),
                   ],
                 ],
@@ -330,7 +332,7 @@ class _LanguagePicker extends StatelessWidget {
       underline: const SizedBox.shrink(),
       borderRadius: BorderRadius.circular(AppColors.radiusSmall),
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
             fontWeight: FontWeight.w600,
           ),
       onChanged: (AppLanguage? v) {

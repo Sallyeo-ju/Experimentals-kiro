@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/teal_background.dart';
@@ -52,7 +53,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textOnTeal,
+        foregroundColor: context.c.textOnCanvas,
         elevation: 0,
       ),
       body: SafeArea(
@@ -67,9 +68,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Container(
                 padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.c.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusCard),
-                  border: Border.all(color: AppColors.surfaceLine),
+                  border: Border.all(color: context.c.surfaceLine),
                   boxShadow: AppColors.cardShadow,
                 ),
                 child: sent
@@ -91,12 +92,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 child: TextButton(
                   onPressed: () => context.go(AppRoutes.auth),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.accent,
+                    foregroundColor: context.c.accent,
                   ),
                   child: Text(
                     'Kembali ke halaman masuk',
                     style: text.bodyMedium?.copyWith(
-                      color: AppColors.accent,
+                      color: context.c.accent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -142,7 +143,7 @@ class _FormState extends StatelessWidget {
           Text(
             'Masukkan email kamu. Kami akan mengirim tautan untuk mengatur '
             'ulang kata sandi.',
-            style: text.bodyMedium?.copyWith(color: AppColors.textSecondary),
+            style: text.bodyMedium?.copyWith(color: context.c.textSecondary),
           ),
           const SizedBox(height: 20),
           if (hasError) ...<Widget>[
@@ -193,9 +194,9 @@ class _SentState extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const Icon(
+        Icon(
           Icons.mark_email_read_outlined,
-          color: AppColors.bullishOnSurface,
+          color: context.c.bullishOnSurface,
           size: 40,
         ),
         const SizedBox(height: 12),
@@ -210,7 +211,7 @@ class _SentState extends StatelessWidget {
               ? 'Tautan untuk mengatur ulang kata sandi telah dikirim.'
               : 'Tautan untuk mengatur ulang kata sandi telah dikirim ke $email.',
           textAlign: TextAlign.center,
-          style: text.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          style: text.bodyMedium?.copyWith(color: context.c.textSecondary),
         ),
         const SizedBox(height: 20),
         OutlinedButton(

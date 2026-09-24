@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/bob_colors.dart';
 import '../../core/widgets/app_logo.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/teal_background.dart';
@@ -74,9 +75,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Container(
                 padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.c.surface,
                   borderRadius: BorderRadius.circular(AppColors.radiusCard),
-                  border: Border.all(color: AppColors.surfaceLine),
+                  border: Border.all(color: context.c.surfaceLine),
                   boxShadow: AppColors.cardShadow,
                 ),
                 child: Form(
@@ -95,7 +96,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       Text(
                         'Buat akun untuk mulai bertanya ke BOB.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.c.textSecondary,
                             ),
                       ),
                       const SizedBox(height: 20),
@@ -157,16 +158,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                       const SizedBox(height: 12),
                       Row(
-                        children: const <Widget>[
-                          Expanded(child: Divider()),
+                        children: <Widget>[
+                          const Expanded(child: Divider()),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: Text(
                               'atau',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: context.c.textSecondary),
                             ),
                           ),
-                          Expanded(child: Divider()),
+                          const Expanded(child: Divider()),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -184,14 +185,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Text(
+                  Text(
                     'Sudah punya akun?',
-                    style: TextStyle(color: AppColors.textOnTeal2),
+                    style: TextStyle(color: context.c.textOnCanvas2),
                   ),
                   TextButton(
                     onPressed: () => context.go(AppRoutes.auth),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.accent,
+                      foregroundColor: context.c.accent,
                     ),
                     child: const Text('Masuk'),
                   ),
